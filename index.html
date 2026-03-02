@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>shelf · 四个小项目</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f4f2ef;  /* 温暖柔和底色 */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            color: #1e1e1e;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .shelf {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        /* 头部 — 留足呼吸空间 */
+        .shelf-header {
+            margin-bottom: 3.5rem;
+        }
+
+        .shelf-header h1 {
+            font-size: 3rem;
+            font-weight: 450;
+            letter-spacing: -0.03em;
+            color: #2c2c2c;
+            line-height: 1.1;
+        }
+
+        .shelf-header p {
+            font-size: 1.15rem;
+            color: #6b6b6b;
+            margin-top: 0.5rem;
+            border-left: 3px solid #cbc7c0;
+            padding-left: 1.2rem;
+        }
+
+        /* 网格 — 两列，优雅间距 */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.8rem;
+            margin: 2rem 0 3rem;
+        }
+
+        @media (max-width: 600px) {
+            .project-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        /* 卡片 — 安静且有质感 */
+        .project-card {
+            display: block;
+            background-color: #ffffff;
+            border-radius: 32px;
+            padding: 2rem 1.8rem 1.8rem 1.8rem;
+            text-decoration: none;
+            color: #1e1e1e;
+            box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+            transition: all 0.25s ease;
+            border: 1px solid #efebe7;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 24px 32px -12px rgba(0, 0, 0, 0.08), 0 6px 12px -4px rgba(0, 0, 0, 0.02);
+            border-color: #dcd6cf;
+            background-color: #ffffff;
+        }
+
+        /* 每个卡片的特征表情 */
+        .card-emoji {
+            font-size: 2.6rem;
+            line-height: 1;
+            display: block;
+            margin-bottom: 1.4rem;
+            opacity: 0.9;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.02));
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 460;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px dashed #e2dbd3;
+            padding-bottom: 0.5rem;
+        }
+
+        /* 小箭头 — 常显但低调 */
+        .card-title .arrow {
+            font-size: 1.4rem;
+            color: #b1a9a0;
+            transition: color 0.2s, transform 0.15s;
+        }
+
+        .project-card:hover .card-title .arrow {
+            color: #7c7c7c;
+            transform: translateX(3px);
+        }
+
+        .card-desc {
+            color: #5e5e5e;
+            font-size: 0.95rem;
+            margin-top: 0.6rem;
+            line-height: 1.4;
+        }
+
+        /* 脚注 — 干净、路径信息用小字 */
+        .shelf-footer {
+            margin-top: 3.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #8d8a86;
+            border-top: 1px solid #e1d9d2;
+            padding-top: 1.5rem;
+        }
+
+        .path {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            background: #e9e3dc;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            color: #4f4b47;
+            font-size: 0.8rem;
+            letter-spacing: 0.01em;
+            border: 1px solid #d6cdc4;
+        }
+
+        .note {
+            color: #94908b;
+        }
+
+        /* 一个非常细微的装饰 — 角落的小点，不抢眼 */
+        .shelf-header h1::before {
+            content: '◆';
+            font-size: 1.4rem;
+            color: #c6bcb0;
+            margin-right: 8px;
+            font-weight: 300;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="shelf">
+        <div class="shelf-header">
+            <h1>小小项目 shelf</h1>
+            <p>E:\share\web 里的四个页面 · 点击卡片直接跳转</p>
+        </div>
+
+        <div class="project-grid">
+            <!-- cat.html 小猫图片 -->
+            <a href="cat.html" class="project-card">
+                <span class="card-emoji">🐈‍⬛</span>
+                <div class="card-title">
+                    小猫图片
+                    <span class="arrow">↗</span>
+                </div>
+                <div class="card-desc">
+                    每次刷新都是新的小猫 · 来自随机API
+                </div>
+            </a>
+
+            <!-- Exam(1).html 题库练习系统 -->
+            <a href="Exam(1).html" class="project-card">
+                <span class="card-emoji">📘</span>
+                <div class="card-title">
+                    题库练习
+                    <span class="arrow">↗</span>
+                </div>
+                <div class="card-desc">
+                    轻量练习系统 · 检验知识点
+                </div>
+            </a>
+
+            <!-- game.html 俄罗斯方块 -->
+            <a href="game.html" class="project-card">
+                <span class="card-emoji">◻️◻️</span>
+                <div class="card-title">
+                    俄罗斯方块
+                    <span class="arrow">↗</span>
+                </div>
+                <div class="card-desc">
+                    经典下落 · 键盘控制 · 怀旧时刻
+                </div>
+            </a>
+
+            <!-- timer.html 90分钟计时器 -->
+            <a href="timer.html" class="project-card">
+                <span class="card-emoji">⏳</span>
+                <div class="card-title">
+                    90' 计时器
+                    <span class="arrow">↗</span>
+                </div>
+                <div class="card-desc">
+                    专注学习法 · 90分钟可设定
+                </div>
+            </a>
+        </div>
+
+        </body>
+</html>

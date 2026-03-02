@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能题库练习系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f5f7fa; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 3px 15px rgba(0,0,0,0.1); padding: 30px; }
+        h1 { color: #2c3e50; margin-bottom: 10px; text-align: center; }
+        .subtitle { color: #7f8c8d; text-align: center; margin-bottom: 30px; }
+        
+        /* 导入区域 */
+        .import-area { background: #f8f9fa; padding: 25px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #3498db; }
+        .format-guide { background: #fffde7; border: 1px solid #ffeb3b; border-radius: 6px; padding: 15px; margin-bottom: 20px; }
+        .format-guide h3 { color: #f39c12; margin-bottom: 10px; }
+        
+        textarea { width: 100%; height: 200px; padding: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; line-height: 1.6; margin-bottom: 15px; resize: vertical; }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px; transition: 0.2s; margin: 5px; }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-primary:hover { background: #2980b9; }
+        .btn-secondary { background: #ecf0f1; color: #34495e; }
+        .btn-secondary:hover { background: #d5dbdb; }
+        .btn-success { background: #2ecc71; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-warning { background: #f39c12; color: white; }
+        
+        /* 练习区域 */
+        .practice-area { display: none; }
+        .stats { display: flex; justify-content: space-between; background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .stat-item { text-align: center; flex: 1; }
+        .stat-value { font-size: 24px; font-weight: bold; color: #3498db; }
+        .stat-label { font-size: 12px; color: #7f8c8d; margin-top: 5px; }
+        
+        .question-box { background: white; border: 1px solid #eee; border-radius: 8px; padding: 25px; margin-bottom: 20px; }
+        .question-header { display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+        .question-number { font-weight: bold; color: #3498db; }
+        .question-type { background: #e74c3c; color: white; padding: 3px 10px; border-radius: 20px; font-size: 12px; }
+        .question-type.single { background: #3498db; }
+        .question-type.truefalse { background: #f39c12; }
+        
+        .options { margin-bottom: 20px; }
+        .option { padding: 12px 15px; margin-bottom: 10px; border: 2px solid #eaeaea; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .option:hover { border-color: #bdc3c7; background: #f9f9f9; }
+        .option.selected { border-color: #3498db; background: #e8f4fc; }
+        .option.correct { border-color: #2ecc71; background: #e8f8ef; }
+        .option.incorrect { border-color: #e74c3c; background: #fdedec; }
+        
+        .explanation { background: #f9f9f9; border-left: 4px solid #3498db; padding: 15px; border-radius: 6px; margin-top: 20px; display: none; }
+        
+        .controls { display: flex; justify-content: space-between; margin-top: 20px; }
+        .question-nav { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 25px; }
+        .nav-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid #ddd; background: white; cursor: pointer; font-size: 14px; }
+        .nav-btn.current { background: #3498db; border-color: #3498db; color: white; }
+        .nav-btn.answered { background: #2ecc71; border-color: #2ecc71; color: white; }
+        .nav-btn.incorrect { background: #e74c3c; border-color: #e74c3c; color: white; }
+        
+        .status { margin-top: 10px; padding: 10px; border-radius: 6px; font-size: 14px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        
+        .btn-group { display: flex; flex-wrap: wrap; justify-content: center; margin: 15px 0; }
+        
+        /* 判断题选项样式 */
+        .true-false-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .true-false-btn {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .true-btn {
+            background: #e8f6f3;
+            border: 2px solid #1abc9c;
+            color: #16a085;
+        }
+        .false-btn {
+            background: #fdedec;
+            border: 2px solid #e74c3c;
+            color: #c0392b;
+        }
+        .true-btn.selected {
+            background: #1abc9c;
+            color: white;
+        }
+        .false-btn.selected {
+            background: #e74c3c;
+            color: white;
+        }
+        .true-btn.correct {
+            background: #2ecc71;
+            border-color: #27ae60;
+            color: white;
+        }
+        .false-btn.incorrect {
+            background: #e74c3c;
+            border-color: #c0392b;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>智能题库练习系统</h1>
+        <p class="subtitle">支持多种格式导入，专注于背题复习</p>
+        
+        <div class="import-area" id="importArea">
+            <div class="format-guide">
+                <h3>📋 选择题库来源</h3>
+                <p>请选择一种方式加载题目：</p>
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn btn-success" id="useSingleChoiceBtn">单选题库（70道Kotlin/Android题）</button>
+                <button class="btn btn-warning" id="useTrueFalseBtn">判断题库（30道Kotlin/Android题）</button>
+                <button class="btn btn-primary" id="useCustomBtn">使用自定义题库（JSON格式）</button>
+                <button class="btn btn-secondary" id="useTextBtn">使用文本格式导入</button>
+            </div>
+            
+            <div id="customInputArea" style="display: none;">
+                <textarea id="inputArea" placeholder='请在此粘贴JSON格式的题目数据，例如：
+[
+  {
+    "id": 1,
+    "question": "题目内容",
+    "options": ["A. 选项A", "B. 选项B", "C. 选项C", "D. 选项D"],
+    "answer": "C",
+    "explanation": "解析内容",
+    "type": "single"  // 或 "truefalse"
+  }
+]'></textarea>
+                <button class="btn btn-primary" id="importCustomBtn">导入自定义题库</button>
+            </div>
+            
+            <div id="textInputArea" style="display: none;">
+                <textarea id="textInput" placeholder="请在此粘贴文本格式的题目..."></textarea>
+                <button class="btn btn-primary" id="importTextBtn">导入文本题库</button>
+            </div>
+            
+            <div id="status" class="status"></div>
+        </div>
+        
+        <div class="practice-area" id="practiceArea">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalQuestions">0</div>
+                    <div class="stat-label">题目总数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="answeredQuestions">0</div>
+                    <div class="stat-label">已答题数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="correctAnswers">0</div>
+                    <div class="stat-label">答对题数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="accuracyRate">0%</div>
+                    <div class="stat-label">正确率</div>
+                </div>
+            </div>
+            
+            <div class="question-box" id="questionBox"></div>
+            
+            <div class="controls">
+                <button class="btn btn-secondary" id="prevBtn">上一题</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" id="submitBtn">提交答案</button>
+                    <button class="btn btn-success" id="nextBtn">下一题</button>
+                </div>
+                <button class="btn btn-secondary" id="showAnswerBtn">显示答案</button>
+            </div>
+            
+            <div class="question-nav" id="questionNav"></div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-danger" id="resetBtn">重新开始</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 内置题库 - 70道Kotlin/Android单选题
+     // 70道Kotlin/Android单选题
+const singleChoiceQuestions = [
+  {
+    id: 1,
+    question: "下列关于 Kotlin 与 Java 注释写法的说法，正确的是？",
+    options: [
+      "A. 单行注释 Kotlin 用 //,Java 用 #",
+      "B. 多行注释 Kotlin 用 /*/,Java 无多行注释",
+      "C. 注释写法与 Java 完全一致",
+      "D. Kotlin 无单行注释"
+    ],
+    answer: "C",
+    explanation: "Kotlin 与 Java 的注释写法完全相同，单行注释均使用 '//'，多行注释均使用 '/**'；A 选项中 Java 单行注释不用 '#'，B 选项中 Java 支持多行注释，D 选项中 Kotlin 有单行注释，因此正确答案为 C。"
+  },
+  {
+    id: 2,
+    question: "关于 Kotlin 的注释写法，以下说法正确的是？",
+    options: [
+      "A. 单行注释使用 //,多行注释使用 /*/,与 Java 一致",
+      "B. 单行注释使用 #,多行注释使用 //",
+      "C. 单行注释使用 //,多行注释使用 //*",
+      "D. Kotlin 不支持多行注释"
+    ],
+    answer: "A",
+    explanation: "Kotlin 的注释规则与 Java 完全一致，单行注释以 // 开头，多行注释以 /* 开头、*/结尾；B 中 # 是 Python 等语言的单行注释符号；C 的多行注释写法不合法；D 错误，Kotlin 支持多行注释。因此正确答案为 A。"
+  },
+  {
+    id: 3,
+    question: "Kotlin 首次发布的年份是？",
+    options: [
+      "A. 2016 年",
+      "B. 2017 年",
+      "C. 2011 年",
+      "D. 2019 年"
+    ],
+    answer: "C",
+    explanation: "JetBrains 于 2011 年首次发布 Kotlin 项目；2016 年是 Kotlin 1.0 正式版发布年份，标志其进入生产环境；2017 年 Google 宣布 Kotlin 为 Android 官方开发语言；2019 年 Kotlin 成为 Android 首选开发语言，因此正确答案为 C。"
+  },
+  {
+    id: 4,
+    question: "Kotlin 成为 Android 官方首选开发语言的年份是？",
+    options: [
+      "A. 2017 年",
+      "B. 2016 年",
+      "C. 2020 年",
+      "D. 2019 年"
+    ],
+    answer: "D",
+    explanation: "2017 年 Google 仅宣布 Kotlin 为 Android 官方开发语言，并非'首选'；2016 年是 Kotlin 1.0 正式版发布年份；2019 年 Google 明确 Kotlin 成为 Android 官方首选开发语言，2020 年无此相关重要节点，因此正确答案为 D。"
+  },
+  {
+    id: 5,
+    question: "Kotlin 对比 Java 的核心优势不包括下列哪项？",
+    options: [
+      "A. 编译期空安全",
+      "B. 表达式函数体",
+      "C. 语法更繁琐",
+      "D. 自动生成 getter/setter"
+    ],
+    answer: "C",
+    explanation: "Kotlin 的核心优势之一是语法简洁，能减少约 40% 的模板代码，而非'语法更繁琐'，编译期空安全可避免空指针异常，表达式函数体简化单行函数写法，自动生成 getter/setter 能提高开发效率，均为其核心优势，因此正确答案为 C。"
+  },
+  {
+    id: 6,
+    question: "Kotlin 中定义可变变量应使用的关键字是？",
+    options: [
+      "A. val",
+      "B. final",
+      "C. var",
+      "D. static"
+    ],
+    answer: "C",
+    explanation: "Kotlin 中 var 用于定义可变变量，支持多次赋值；val 用于定义不可变变量，仅能赋值一次；final 是 Java 中定义常量的关键字；static 用于 Java 中声明静态成员，均不用于 Kotlin 可变变量定义。因此正确答案为 C。"
+  },
+  {
+    id: 7,
+    question: "以下 Kotlin 代码的输出结果是？\nval apples = 5;\nval oranges = 8;\nprintln('水果总数:${apples + oranges}')",
+    options: [
+      "A. 水果总数:58",
+      "B. 水果总数:apples + oranges",
+      "C. 水果总数:13",
+      "D. 编译错误"
+    ],
+    answer: "C",
+    explanation: "Kotlin 字符串模板中，${} 可包裹复杂表达式并计算结果，apples + oranges 的结果为 13，因此输出'水果总数:13'；A 是字符串拼接而非数值相加，错误；B 未识别表达式，错误；该代码语法合法，不会编译错误，D 错误。因此正确答案为 C。"
+  },
+  {
+    id: 8,
+    question: "Kotlin 中 val 变量的 getter/setter 特性是？",
+    options: [
+      "A. 自动生成 getter 和 setter",
+      "B. 需手动编写 getter 和 setter",
+      "C. 仅自动生成 getter",
+      "D. 仅自动生成 setter"
+    ],
+    answer: "C",
+    explanation: "val 是不可变变量，一旦赋值无法修改，因此系统仅自动生成 getter 方法用于读取值；var 是可变变量，会自动生成 getter 和 setter 方法；val 无需手动编写 getter，B 错误。因此正确答案为 C。"
+  },
+  {
+    id: 9,
+    question: "Kotlin 函数的命名参数的作用是？",
+    options: [
+      "A. 强制参数必须按固定顺序传入",
+      "B. 减少函数参数的数量",
+      "C. 提高代码可读性，明确参数用途",
+      "D. 只能用于无返回值的函数"
+    ],
+    answer: "C",
+    explanation: "命名参数允许调用函数时明确指定参数名，即使调整参数顺序也不影响功能，能让他人清晰了解每个参数的含义，提高代码可读性；A 错误，命名参数支持灵活调整参数顺序；B 错误，命名参数不改变参数数量；D 错误，命名参数可用于各类函数，与是否有返回值无关。因此正确答案为 C。"
+  },
+  {
+    id: 10,
+    question: "有以下 greet 函数的定义，则下列选项中，属于默认参数用法的是？\nfun greet(name: String = 'Guest') {\n  println('Hello $name')\n}",
+    options: [
+      "A. greet('李四')",
+      "B. greet(name = '王五')",
+      "C. greet()",
+      "D. greet('赵六', 'Guest')"
+    ],
+    answer: "C",
+    explanation: "默认参数函数 greet(name: String = 'Guest') 中，name 参数有默认值'Guest'，调用时可不传入该参数，直接使用默认值，C 符合；A 和 B 是传入参数的调用方式；D 传入两个参数，而函数仅接收一个参数，参数数量不匹配，语法错误。因此正确答案为 C。"
+  },
+  {
+    id: 11,
+    question: "Kotlin 中替代 Java 三元表达式(条件？表达式1：表达式2)的是？",
+    options: [
+      "A. when 表达式",
+      "B. for 循环",
+      "C. if-else 表达式",
+      "D. while 循环"
+    ],
+    answer: "C",
+    explanation: "Kotlin 没有三元表达式，可通过 if-else 表达式实现赋值操作，如 val max = if (a > b) a else b，与三元表达式功能一致；when 表达式用于多分支选择；for 和 while 是循环语句，均不具备条件赋值功能。因此正确答案为 C。"
+  },
+  {
+    id: 12,
+    question: "以下关于 Kotlin while 循环的说法正确的是？",
+    options: [
+      "A. 至少执行一次循环体",
+      "B. 循环体不能包含变量自增操作",
+      "C. 初始条件不成立时，一次都不执行",
+      "D. 必须与 do 关键字配合使用"
+    ],
+    answer: "C",
+    explanation: "while 循环先判断初始条件，若条件不成立则不执行循环体；A 是 do-while 循环的特点；B 错误，while 循环体可正常包含变量自增；D 错误，while 循环独立使用，do-while 是另一种循环结构，无需配合。因此正确答案为 C。"
+  },
+  {
+    id: 13,
+    question: "有以下函数定义，则下列选项中调用方式错误的是？\nfun checkScore(name: String, score: Int = 60)",
+    options: [
+      "A. checkScore('张三')",
+      "B. checkScore('李四', 85)",
+      "C. checkScore(score = 70, name = '王五')",
+      "D. checkScore(90, '赵六')"
+    ],
+    answer: "D",
+    explanation: "该函数第一个参数 name 为 String 类型，第二个参数 score 为 Int 类型，D 中传入的参数顺序颠倒，90（Int 类型）无法匹配 name 参数，'赵六'（String 类型）无法匹配 score 参数，编译错误；A 仅传入 name 参数，score 使用默认值 60，正确；B 传入两个参数，顺序正确，正确；C 使用命名参数，顺序可调整，正确。因此正确答案为 D。"
+  },
+  {
+    id: 14,
+    question: "以下 Kotlin 代码中，自定义 getter 逻辑正确的是？",
+    options: [
+      "A. var number: Int = 10\n   get() = field * 2\n   set(value) { field = value }",
+      "B. val number: Int = 10\n   set() = field + 5",
+      "C. var number: Int = 10\n   get() { field = field * 2 }",
+      "D. val number: Int = 10\n   set(value) { field = value }"
+    ],
+    answer: "A",
+    explanation: "自定义 getter 需返回对应类型的值，A 中 get() 返回 field * 2，逻辑正确，setter 也符合规范；B 中 val 为不可变变量，不可自定义 setter；C 中 getter 未返回值，语法错误；D 中 val 不可变变量不能自定义 setter，语法错误。因此正确答案为 A。"
+  },
+  {
+    id: 15,
+    question: "Kotlin 类中，主构造函数、init 初始化块、次构造函数的执行顺序是？",
+    options: [
+      "A. 次构造函数体→init 块→主构造参数赋值",
+      "B. init 块→主构造参数赋值→次构造函数体",
+      "C. 主构造参数赋值→init 块→次构造函数体",
+      "D. 主构造参数赋值→次构造函数体→init 块"
+    ],
+    answer: "C",
+    explanation: "Kotlin 类初始化时，先执行主构造函数的参数赋值和属性初始化，再依次执行所有 init 块的逻辑，最后执行次构造函数体；A、B、D 均颠倒了执行顺序，不符合类初始化的底层逻辑。因此正确答案为 C。"
+  },
+  {
+    id: 16,
+    question: "open 关键字的作用是？",
+    options: [
+      "A. 声明抽象类，不能直接实例化",
+      "B. 禁止类或方法被继承/重写",
+      "C. 允许类或方法被继承/重写",
+      "D. 声明编译期常量，只能用于属性"
+    ],
+    answer: "C",
+    explanation: "Kotlin 中类和方法默认是 final（不可继承/重写），open 关键字用于取消该限制，允许类被继承、方法被重写；A 是 abstract 关键字的作用；B 是 final 关键字的作用（默认行为）；D 是 const 关键字的作用。因此正确答案为 C。"
+  },
+  {
+    id: 17,
+    question: "以下关于 abstract 关键字的说法，正确的是？",
+    options: [
+      "A. 抽象类可直接实例化，无需子类继承",
+      "B. 抽象方法必须包含方法体，子类可选择是否重写",
+      "C. 抽象类中可包含非抽象方法（带实现）",
+      "D. 一个类可同时继承多个抽象类"
+    ],
+    answer: "C",
+    explanation: "抽象类（abstract class）中可混合包含抽象方法（无方法体，需子类重写）和非抽象方法（带实现）；A 错误，抽象类不能直接实例化，必须通过子类继承实现；B 错误，抽象方法无方法体，子类必须重写；D 错误，Kotlin 仅支持单继承，不能同时继承多个抽象类。因此正确答案为 C。"
+  },
+  {
+    id: 18,
+    question: "Kotlin 中实现'类级别的静态成员'，可通过以下哪种方式？",
+    options: [
+      "A. 直接使用 static 关键字声明",
+      "B. 定义在伴生对象(companion object)中",
+      "C. 仅能通过单例对象(object)声明",
+      "D. 把属性和方法定义在类的外部"
+    ],
+    answer: "B",
+    explanation: "Kotlin 无 static 关键字，需通过伴生对象（companion object）声明类级别的属性和方法（属于类本身，而非实例）；A 错误，Kotlin 不支持 static 关键字；C 错误，单例对象是独立的全局对象，并非类的静态成员；D 错误，类外部的属性和方法是全局的，并非类的成员。因此正确答案为 B。"
+  },
+  {
+    id: 19,
+    question: "Kotlin 中不可空类型变量的特性是？",
+    options: [
+      "A. 可以直接赋值为 null",
+      "B. 需在类型后加？声明",
+      "C. 不允许赋值为 null",
+      "D. 只能是 String 类型"
+    ],
+    answer: "C",
+    explanation: "Kotlin 默认变量为不可空类型，不允许赋值为 null，若需赋值为 null 需声明为可空类型（类型后加 ?）；A 和 B 是可空类型的特性；D 错误，不可空类型可涵盖 int、Long 等多种数据类型，并非仅限 String。因此正确答案为 C。"
+  },
+  {
+    id: 20,
+    question: "以下代码中，能安全获取可空变量 b 长度的是？\nvar b: String? = 'Kotlin'",
+    options: [
+      "A. val length = b.length",
+      "B. val length = b!!.length",
+      "C. val length = b?.length",
+      "D. val length = length(b)"
+    ],
+    answer: "C",
+    explanation: "b 为可空类型变量，需使用安全调用运算符（?.）访问其 length 属性，若 b 为 null，表达式结果为 null，不会抛出异常；C 正确；A 直接使用.访问，编译错误；B 是非空断言运算符，若 b 为 null 会抛出空指针异常；D 中 length() 并非 Kotlin 获取字符串长度的方法。因此正确答案为 C。"
+  },
+  {
+    id: 21,
+    question: "以下 Kotlin 代码中，len 值是？\nvar b: String? = null;\nval len = b?.length ?: 0",
+    options: [
+      "A. null",
+      "B. 编译错误",
+      "C. 0",
+      "D. 抛出空指针异常"
+    ],
+    answer: "C",
+    explanation: "该代码使用了安全调用运算符（?.）和 Elvis 运算符（?:），b 为 null 时，b?.length 结果为 null，Elvis 运算符会返回默认值 0，因此 len 值为 0；A 未考虑 Elvis 运算符的默认值作用；代码语法合法，不会编译错误，B 错误；安全调用和 Elvis 运算符避免了空指针异常，D 错误。因此正确答案为 C。"
+  },
+  {
+    id: 22,
+    question: "Kotlin 空安全机制的核心是通过什么实现的？",
+    options: [
+      "A. 运行时自动处理空指针异常",
+      "B. 禁止所有变量为 null",
+      "C. 类型系统区分可空与不可空类型",
+      "D. 强制所有变量必须为 null"
+    ],
+    answer: "C",
+    explanation: "Kotlin 空安全机制的核心是类型系统，默认变量为不可空类型，可空类型需显式声明（类型后加 ?），从根源上区分变量是否允许为 null；A 错误，空安全机制在编译期检测问题，而非运行时处理；B 错误，可空类型变量允许为 null；D 错误，不可空类型变量不允许为 null。因此正确答案为 C。"
+  },
+  {
+    id: 23,
+    question: "阅读以下代码，result 的结果是？\nval number = 15\nval result = number.takeIf { it % 3 == 0 }?.let { it / 3 } ?: -1",
+    options: [
+      "A. 5",
+      "B. 15",
+      "C. -1",
+      "D. 3"
+    ],
+    answer: "A",
+    explanation: "takeIf 函数判断 number（15）是否为 3 的倍数（15%3==0 成立），返回 number 本身（15）；接着通过安全调用 ?. 执行 let，it 指代 15，let 的返回值为 15/3=5；Elvis 运算符 ?: 仅在 takeIf 返回 null 时生效，此处不触发。B 是 takeIf 的返回值，未经过 let 的计算；C 是条件不成立时的结果；D 计算错误。因此正确答案为 A。"
+  },
+  {
+    id: 24,
+    question: "以下哪种方法用于创建 Kotlin 不可变 List？",
+    options: [
+      "A. mutableListOf()",
+      "B. arrayListOf()",
+      "C. listOf()",
+      "D. mutableSetOf()"
+    ],
+    answer: "C",
+    explanation: "Kotlin 中不可变集合的创建方法遵循'前缀无 mutable'的规则，listOf() 用于创建不可变 List；mutableListOf() 用于创建可变 List，A 错误；arrayListOf() 是 Java 风格的 List 创建方法，并非 Kotlin 标准不可变 List 创建方式，B 错误；mutableSetOf() 用于创建可变 Set，与 List 无关，D 错误。因此正确答案为 C。"
+  },
+  {
+    id: 25,
+    question: "集合操作符 filter 的作用是？",
+    options: [
+      "A. 对集合元素进行排序，生成新集合",
+      "B. 提取集合元素的指定属性，生成新集合",
+      "C. 根据条件筛选出满足要求的元素，生成新集合",
+      "D. 将集合元素分组，返回键值对集合"
+    ],
+    answer: "C",
+    explanation: "filter 操作符接收一个条件表达式，遍历集合时仅保留满足条件的元素，生成新集合，C 正确；A 是 sorted 系列操作符的作用；B 是 map 操作符的常见用法；D 是 groupBy 操作符的作用。因此正确答案为 C。"
+  },
+  {
+    id: 26,
+    question: "以下关于可变 List 的 add 操作，正确的是？",
+    options: [
+      "A. 只能在集合末尾添加元素，不能指定位置",
+      "B. 添加重复元素会抛出异常",
+      "C. add(index, element) 可在指定下标位置插入元素",
+      "D. 不可变 List 也支持 add 操作"
+    ],
+    answer: "C",
+    explanation: "可变 List 的 add 方法有两种重载：add(element) 在末尾添加元素，add(index, element) 在指定下标插入元素，C 正确；A 错误，支持指定位置插入；B 错误，List 允许重复元素，添加重复元素会正常生效；D 错误，不可变 List（如 listOf 创建）不支持增加操作，无 add 方法。因此正确答案为 C。"
+  },
+  {
+    id: 27,
+    question: "向 Kotlin mutableSetOf('苹果','香蕉') 中添加 '苹果'，结果是？",
+    options: [
+      "A. 集合变为 ['苹果','香蕉','苹果']",
+      "B. 抛出重复元素异常",
+      "C. 集合保持 ['苹果','香蕉']，重复元素不添加",
+      "D. 集合变为 ['香蕉','苹果']，顺序随机调整"
+    ],
+    answer: "C",
+    explanation: "Set 集合的核心特性是不重复，向可变 Set 添加已存在的元素时，操作无效，集合内容保持不变；A 违反 Set 不重复规则；B 错误，Set 不会因重复元素抛出异常；D 错误，添加重复元素不会改变原有元素顺序。因此正确答案为 C。"
+  },
+  {
+    id: 28,
+    question: "Map 的 getOrDefault(key, defaultValue) 方法的作用是？",
+    options: [
+      "A. 若 key 存在，返回对应的 value；若不存在，返回 defaultValue",
+      "B. 若 key 存在，返回 defaultValue；若不存在，返回 null",
+      "C. 无论 key 是否存在，均返回 defaultValue",
+      "D. 若 key 存在，更新 value 为 defaultValue；若不存在，添加该键值对"
+    ],
+    answer: "A",
+    explanation: "getOrDefault 是 Map 的安全获取方法，逻辑为'键存在则返回对应 value，不存在则返回默认值'，避免直接 get(key) 返回 null 的情况；B 逻辑颠倒；C 忽略了 key 存在时应返回实际 value 的规则；D 是 put 操作的变种逻辑，与 getOrDefault 的'获取'功能无关。因此正确答案为 A。"
+  },
+  {
+    id: 29,
+    question: "Kotlin 中 Lambda 表达式的标准语法结构是？",
+    options: [
+      "A. (参数列表) -> [函数体]",
+      "B. fun (参数列表): 返回类型 [函数体]",
+      "C. {参数 -> 函数体}",
+      "D. 函数名 = {参数 -> 函数体}"
+    ],
+    answer: "C",
+    explanation: "Lambda 表达式的核心语法是用大括号包裹，内部通过'参数 -> 函数体'关联参数与执行逻辑，C 是标准格式；A 多余括号且语法顺序错误；B 是普通函数的定义格式，并非 Lambda；D 是 Lambda 赋值给变量的写法，并非 Lambda 本身的语法结构。因此正确答案为 C。"
+  },
+  {
+    id: 30,
+    question: "Lambda 表达式中'it'的使用条件是？",
+    options: [
+      "A. 无论参数数量多少，都可使用 it 代替参数名",
+      "B. 仅当 Lambda 无参数时，用 it 作为默认标识",
+      "C. 仅当 Lambda 有且仅有一个参数时，可省略参数名用 it 代替",
+      "D. 仅当 Lambda 有两个及以上参数时，用 it 指代第一个参数"
+    ],
+    answer: "C",
+    explanation: "it 是 Lambda 的默认参数名，仅适用于'有且仅有一个参数'的场景，此时可省略参数名，直接用 it 代表该参数，C 正确；A 错误，多参数 Lambda 不能用 it 代替所有参数；B 错误，无参数 Lambda 无需使用 it；D 错误，多参数 Lambda 需显式声明参数名，不能用 it 指代单个参数。因此正确答案为 C。"
+  },
+  {
+    id: 31,
+    question: "阅读代码，user 对象的 name 和 age 属性值是？\ndata class User(var name: String, var age: Int)\nval user = User('Jack', 20).apply {\n    name = 'Tom'\n    age += 5\n}",
+    options: [
+      "A. name=Jack,age=20",
+      "B. name=Jack,age=25",
+      "C. name=Tom,age=25",
+      "D. name=Tom,age=20"
+    ],
+    answer: "C",
+    explanation: "apply 函数内部用 this 指代当前对象（User 实例），可直接修改属性。代码中通过 apply 将 name 改为 'Tom'，age 在 20 基础上加 5 变为 25，且 apply 返回修改后的对象本身，因此 user 的属性为 name=Tom、age=25。A 是原对象属性，未考虑 apply 的修改；B 和 D 属性修改不完整。因此正确答案为 C。"
+  },
+  {
+    id: 32,
+    question: "takeIf 函数的返回规则是？",
+    options: [
+      "A. 满足条件时返回 null，不满足时返回对象本身",
+      "B. 无论是否满足条件，均返回对象本身",
+      "C. 满足条件时返回对象本身，不满足时返回 null",
+      "D. 无论是否满足条件，均返回 true 或 false"
+    ],
+    answer: "C",
+    explanation: "takeIf 是条件过滤类函数，逻辑为'符合条件则保留自身，否则返回 null'，常用于安全链式调用；A 颠倒了返回规则；B 是无条件返回对象的逻辑，与 takeIf 的条件筛选功能不符；D 错误，takeIf 返回的是对象本身或 null，而非布尔值。因此正确答案为 C。"
+  },
+  {
+    id: 33,
+    question: "协程的本质是？",
+    options: [
+      "A. 操作系统内核管理的重量级线程",
+      "B. 仅用于 UI 更新的特殊线程",
+      "C. 用户态的轻量级线程，由程序控制调度",
+      "D. 必须依赖多线程环境才能运行"
+    ],
+    answer: "C",
+    explanation: "协程是用户态的轻量级线程，无需操作系统内核干预，由程序员或运行时库调度，切换成本低。A 错误，内核线程是重量级的，协程不属于此类；B 错误，协程可用于多种异步场景，不止 UI 更新；D 错误，协程可在单线程环境中运行，通过挂起/恢复实现并发。因此正确答案为 C。"
+  },
+  {
+    id: 34,
+    question: "协程与线程相比，最核心的优势是？",
+    options: [
+      "A. 切换成本高，上下文切换复杂",
+      "B. 受操作系统资源限制，数量有限",
+      "C. 创建/销毁成本低，支持大量并发",
+      "D. 阻塞时会影响整个线程的执行"
+    ],
+    answer: "C",
+    explanation: "协程的核心优势是轻量，创建/销毁无需内核干预，成本远低于线程，可同时管理成千上万个任务；A、B、D 均是线程的特点，而非协程的优势。因此正确答案为 C。"
+  },
+  {
+    id: 35,
+    question: "阅读以下代码，输出结果是？\nfun main() = runBlocking {\n    GlobalScope.launch {\n        delay(100)\n        println('协程任务执行')\n    }\n    println('主线程等待')\n    delay(200)\n}",
+    options: [
+      "A. 协程任务执行→主线程等待",
+      "B. 仅输出'主线程等待'",
+      "C. 仅输出'协程任务执行'",
+      "D. 主线程等待→协程任务执行"
+    ],
+    answer: "D",
+    explanation: "GlobalScope.launch 启动无返回值协程，主线程先打印'主线程等待'，随后延迟200ms期间，协程的 delay(100) 结束，执行打印'协程任务执行'。A 顺序颠倒；B、C 遗漏了其中一个输出，因主线程延迟时间足够协程完成。因此正确答案为 D。"
+  },
+  {
+    id: 36,
+    question: "以下关于 async/await 的用法，正确的是？\nval deferred = GlobalScope.async {\n    delay(500)\n    '异步结果'\n}\nrunBlocking {\n    // 此处填写代码获取结果\n}",
+    options: [
+      "A. val result = deferred.launch()",
+      "B. val result = deferred.cancel()",
+      "C. val result = deferred.await()",
+      "D. val result = deferred.isActive"
+    ],
+    answer: "C",
+    explanation: "async 启动的协程返回 Deferred 对象，需通过 await() 获取返回值；A 错误，launch 是启动协程的方法，Deferred 无此方法；B 错误，cancel() 是取消协程，不返回任务结果；D 错误，isActive 是判断协程是否激活的属性，返回布尔值。因此正确答案为 C。"
+  },
+  {
+    id: 37,
+    question: "阅读以下代码，协程会打印几次'执行任务'？\nfun main() = runBlocking {\n    val job = launch {\n        repeat(5) { i ->\n            if (!isActive) return@launch\n            println('执行任务 $i')\n            delay(200)\n        }\n    }\n    delay(500)\n    job.cancel()\n}",
+    options: [
+      "A. 0 次",
+      "B. 2 次",
+      "C. 3 次",
+      "D. 5 次"
+    ],
+    answer: "C",
+    explanation: "协程每次执行任务后延迟 200ms，主线程延迟 500ms 后取消协程。前 3 次任务执行时间分别为 0ms、200ms、400ms，均在取消前完成；第 4 次任务需等待 600ms，此时已被取消，因此共打印 3 次。A、B、D 均计算错误。因此正确答案为 C。"
+  },
+  {
+    id: 38,
+    question: "适合执行 CPU 密集型任务（如大数据排序、复杂计算）的调度器是？",
+    options: [
+      "A. Dispatchers.IO",
+      "B. Dispatchers.Main",
+      "C. Dispatchers.Default",
+      "D. newSingleThreadContext"
+    ],
+    answer: "C",
+    explanation: "Dispatchers.Default 专门用于 CPU 密集型任务，如计算、排序等；A 错误，Dispatchers.IO 用于 IO 密集型任务（文件读写、网络请求）；B 错误，Dispatchers.Main 用于 UI 主线程；D 错误，newSingleThreadContext 是单线程调度器，适合串行执行任务，不适合 CPU 密集型并发。因此正确答案为 C。"
+  },
+  {
+    id: 39,
+    question: "以下代码中，调度器切换的正确用法是？\nrunBlocking {\n    val data = withContext(Dispatchers.IO) {\n        // 模拟网络请求\n        '网络数据'\n    }\n    // 切换到主线程更新 UI\n    withContext(Dispatchers.Main) {\n        println('更新 UI:%data')\n    }\n}",
+    options: [
+      "A. 两个 withContext 的调度器使用顺序颠倒，应先 Main 后 IO",
+      "B. withContext 不能嵌套使用，会编译错误",
+      "C. 网络请求应使用 Dispatchers.Default，IO 调度器不适用",
+      "D. 先在 IO 调度器执行耗时任务，再切主线程更新 UI"
+    ],
+    answer: "D",
+    explanation: "withContext 的核心作用是切换调度器，该代码先在 IO 调度器执行网络请求（IO 密集型），再切到 Main 调度器更新 UI，符合最佳实践；A 错误，IO 调度器适合后台耗时任务，Main 适合 UI 操作，顺序正确；B 错误，withContext 支持嵌套；C 错误，网络请求属于 IO 密集型，应使用 Dispatchers.IO。因此正确答案为 D。"
+  },
+  {
+    id: 40,
+    question: "挂起函数的声明关键字是？",
+    options: [
+      "A. suspend",
+      "B. coroutine",
+      "C. async",
+      "D. launch"
+    ],
+    answer: "A",
+    explanation: "挂起函数需用 suspend 关键字声明，允许暂停和恢复执行；B 错误，coroutine 是协程的英文名称，并非关键字；C、D 是启动协程的函数，并非声明挂起函数的关键字。因此正确答案为 A。"
+  },
+  {
+    id: 41,
+    question: "以下关于挂起函数的说法，正确的是？",
+    options: [
+      "A. 挂起函数可以在普通函数中直接调用",
+      "B. 挂起函数执行时会阻塞当前线程",
+      "C. 挂起函数只能在协程或其他挂起函数中调用",
+      "D. 挂起函数必须包含 delay() 才能实现挂起"
+    ],
+    answer: "C",
+    explanation: "挂起函数不能在普通函数中直接调用，仅能在协程作用域或其他挂起函数中使用；A 错误，普通函数中调用会编译报错；B 错误，挂起函数暂停时会释放线程，不会阻塞；D 错误，挂起函数可通过多种挂起操作实现挂起，并非必须包含 delay()。因此正确答案为 C。"
+  },
+  {
+    id: 42,
+    question: "阅读以下代码，输出结果是？\nsuspend fun fetchData() = withContext(Dispatchers.IO) {\n    delay(1000)\n    '成功获取数据'\n}\n\nfun main() = runBlocking {\n    val result = fetchData()\n    println(result)\n}",
+    options: [
+      "A. null",
+      "B. 抛出 TimeoutCancellationException",
+      "C. 编译错误",
+      "D. 成功获取数据"
+    ],
+    answer: "D",
+    explanation: "fetchData 是挂起函数，在 IO 调度器中模拟 1 秒耗时操作后返回字符串；runBlocking 创建协程序用域，可正常调用挂起函数并获取结果，最终打印'成功获取数据'。A 错误，未超时不会返回 null；B 错误，无超时设置不会抛异常；代码语法合法，C 错误。因此正确答案为 D。"
+  },
+  {
+    id: 43,
+    question: "协程挂起时的核心行为是？",
+    options: [
+      "A. 阻塞当前线程，直到恢复执行",
+      "B. 终止当前协程，无法恢复",
+      "C. 释放线程资源，让其他协程继续执行",
+      "D. 自动切换到主线程等待"
+    ],
+    answer: "C",
+    explanation: "协程挂起时不会阻塞线程，而是释放线程资源，调度器可将线程分配给其他协程；A 错误，挂起是非阻塞的；B 错误，挂起后可恢复执行；D 错误，挂起时不会自动切换到主线程，仅在指定调度器时切换。因此正确答案为 C。"
+  },
+  {
+    id: 44,
+    question: "Dispatchers.IO 的适用场景是？",
+    options: [
+      "A. 复杂数学计算、数据排序",
+      "B. UI 界面更新、用户交互响应",
+      "C. 网络请求、文件读写等 IO 密集型任务",
+      "D. 单线程串行执行的任务"
+    ],
+    answer: "C",
+    explanation: "Dispatchers.IO 专门优化 IO 密集型任务，如网络请求、文件读写、数据库操作等；A 错误，这是 Dispatchers.Default 的场景；B 错误，这是 Dispatchers.Main 的场景；D 错误，这是 newSingleThreadContext 的场景。因此正确答案为 C。"
+  },
+  {
+    id: 45,
+    question: "ViewModel 的核心特性不包括以下哪项？",
+    options: [
+      "A. 独立于 Activity 旋转生命周期",
+      "B. 数据与 UI 层解耦",
+      "C. 直接负责 UI 控件更新",
+      "D. 支持多 Fragment 数据共享"
+    ],
+    answer: "C",
+    explanation: "ViewModel 的核心作用是保管数据、与 UI 解耦，不直接操作 UI 控件；A、B、D 均是其核心特性，Activity 旋转时 ViewModel 不销毁，可在多个 Fragment 间共享数据。因此正确答案为 C。"
+  },
+  {
+    id: 46,
+    question: "LiveData 与 MutableLiveData 的核心区别是？",
+    options: [
+      "A. LiveData 支持读写，MutableLiveData 仅支持读",
+      "B. 两者均支持读写，无本质差异",
+      "C. LiveData 仅支持读，MutableLiveData 支持读写",
+      "D. 两者均仅支持读，需通过其他方式修改数据"
+    ],
+    answer: "C",
+    explanation: "LiveData 是抽象类，仅提供数据观察（读）能力，无公开修改方法；MutableLiveData 作为其子类，提供 setValue() 和 postValue() 方法，支持数据读写；A、B、D 均混淆了两者的读写权限。因此正确答案为 C。"
+  },
+  {
+    id: 47,
+    question: "DataBinding 布局的根标签是？",
+    options: [
+      "A. LinearLayout",
+      "B. data",
+      "C. layout",
+      "D. variable"
+    ],
+    answer: "C",
+    explanation: "DataBinding 布局必须以layout标签为根，内部包含data（数据库明）和具体布局容器；A 是普通布局容器；B 用于声明绑定的变量；D 用于定义具体的绑定变量。因此正确答案为 C。"
+  },
+  {
+    id: 48,
+    question: "在 Activity 中获取 ViewModel 实例的正确方式是？",
+    options: [
+      "A. 直接通过构造函数创建(val vm = MyViewModel())",
+      "B. 通过 findViewById 获取",
+      "C. 通过 ViewModelProvider 或 by viewModels() 获取",
+      "D. 通过 Application 获取"
+    ],
+    answer: "C",
+    explanation: "ViewModel 不能直接通过构造函数创建，需通过 ViewModelProvider 或 by viewModels()（AndroidX扩展）获取，确保其与页面生命周期关联；A 会导致 ViewModel 无法感知页面生命周期；B 是获取 UI 控件的方法；D 仅 AndroidViewModel 需传入 Application，且仍需通过上述方式获取。因此正确答案为 C。"
+  },
+  {
+    id: 49,
+    question: "DataBinding 布局中，绑定变量到 UI 控件的语法是？",
+    options: [
+      "A. {[变量名]}",
+      "B. ${变量名}",
+      "C. @{变量名}",
+      "D. #{变量名}"
+    ],
+    answer: "C",
+    explanation: "DataBinding 采用 @{变量名} 的语法将数据变量绑定到 UI 控件属性（如 android:text='@{user.name}'）；A 是 Vue 等框架的语法；B 是 Kotlin 字符串模板语法；D 并非 DataBinding 语法。因此正确答案为 C。"
+  },
+  {
+    id: 50,
+    question: "Fragment 中初始化 DataBinding 的正确方式是？",
+    options: [
+      "A. LayoutInflater.from(context).inflate(R.layout.fragment_layout, container)",
+      "B. DataBindingUtil.setContentView(activity, R.layout.fragment_layout)",
+      "C. FragmentLayoutBinding.bind(view)",
+      "D. DataBindingUtil.inflate(inflater, R.layout.fragment_layout, container, false)"
+    ],
+    answer: "D",
+    explanation: "Fragment 需通过 DataBindingUtil.inflate 加载布局，传入 inflater、布局 ID、容器和 attachToRoot（通常为 false）；A 是普通布局加载方式，未启用 DataBinding；B 是 Activity 中初始化 DataBinding 的方法，Fragment 不能使用；C 需先加载布局再绑定，流程繁琐且易出错。因此正确答案为 D。"
+  },
+  {
+    id: 51,
+    question: "ViewModel 中对外暴露 LiveData 时，推荐的封装方式是？",
+    options: [
+      "A. 内部用 MutableLiveData，对外暴露 LiveData",
+      "B. 直接暴露 MutableLiveData",
+      "C. 用 var 修饰 LiveData 动态替换",
+      "D. 用 lateinit 修饰 LiveData 延迟初始化"
+    ],
+    answer: "A",
+    explanation: "MutableLiveData 支持修改数据，LiveData 仅支持观察数据，封装后可限制 UI 层直接修改数据，保证数据流向单一；直接暴露 MutableLiveData 会导致 UI 层随意修改数据，破坏封装性；var 修饰 LiveData 动态替换会丢失观察者订阅；lateinit 修饰仅用于延迟初始化，不涉及数据访问权限控制。因此正确答案为 A。"
+  },
+  {
+    id: 52,
+    question: "DataBinding 中，处理'变量为空时显示默认值'的三元表达式语法是？",
+    options: [
+      "A. ${变量 == null？默认值：变量}",
+      "B. @{变量？: 默认值}",
+      "C. ${变量？: 默认值}",
+      "D. @{变量 == null？默认值：变量}"
+    ],
+    answer: "D",
+    explanation: "DataBinding 支持标准三元表达式，变量为空时返回默认值，非空则返回变量本身；B、C 是 Kotlin 的空安全语法，DataBinding 布局不支持；A 是 Kotlin 字符串模板语法，不能用于 DataBinding 布局。因此正确答案为 D。"
+  },
+  {
+    id: 53,
+    question: "ViewModel 中，协程加载数据后更新 LiveData，应使用的方法是？",
+    options: [
+      "A. setValue()",
+      "B. updateValue()",
+      "C. postValue()",
+      "D. sendValue()"
+    ],
+    answer: "C",
+    explanation: "协程中若在非主线程更新 LiveData，需用 postValue()（自动切换到主线程）；setValue() 仅能在主线程调用；B、D 并非 LiveData 的标准更新方法。因此正确答案为 C。"
+  },
+  {
+    id: 54,
+    question: "DataBinding 中，在 data 代码区定义变量的标签是？",
+    options: [
+      "A. data",
+      "B. bind",
+      "C. variable",
+      "D. param"
+    ],
+    answer: "C",
+    explanation: "variable标签用于在 DataBinding 的data标签内声明绑定变量，指定变量名和类型；data是变量声明的父标签，不直接声明变量；B、D 均非 DataBinding 的标准标签。因此正确答案为 C。"
+  },
+  {
+    id: 55,
+    question: "RecyclerView.Adapter 中，用于加载列表项布局并创建 ViewHolder 的方法是？",
+    options: [
+      "A. onBindViewHolder()",
+      "B. getItemCount()",
+      "C. onCreateViewHolder()",
+      "D. notifyDataSetChanged()"
+    ],
+    answer: "C",
+    explanation: "onCreateViewHolder() 负责加载列表项布局（如 item_layout.xml）并创建 ViewHolder 实例；A 用于给列表项填充数据；B 返回数据总数；D 是刷新列表的通知方法。因此正确答案为 C。"
+  },
+  {
+    id: 56,
+    question: "矢量资源(Vector Drawable)的核心优势是？",
+    options: [
+      "A. 文件体积比位图更大",
+      "B. 仅支持静态展示，不支持动画",
+      "C. 放大后不会失真",
+      "D. 兼容性比位图更差"
+    ],
+    answer: "C",
+    explanation: "矢量资源基于数学公式和几何形状定义，可无限放大而不失真；A 矢量资源文件体积通常比位图小；B 部分矢量资源支持动画效果；D 现代 Android 版本对矢量资源兼容性良好。因此正确答案为 C。"
+  },
+  {
+    id: 57,
+    question: "RecyclerView 中用于设置列表排列方式（如线性、网格）的组件是？",
+    options: [
+      "A. Adapter",
+      "B. ViewHolder",
+      "C. LayoutManager",
+      "D. ItemDecoration"
+    ],
+    answer: "C",
+    explanation: "LayoutManager 定义 RecyclerView 的排列规则，如 LinearLayoutManager（线性排列）、GridLayoutManager（网格排列）；A 用于数据与列表项绑定；B 用于持有列表项控件；D 用于设置列表项间距或装饰。因此正确答案为 C。"
+  },
+  {
+    id: 58,
+    question: "RecyclerView.Adapter 中，批量更新数据后刷新整个列表的标准方法是？",
+    options: [
+      "A. notifyDataSetChanged()",
+      "B. notifyItemRangeChanged()",
+      "C. notifyItemChanged()",
+      "D. refreshAdapter()"
+    ],
+    answer: "A",
+    explanation: "notifyDataSetChanged() 用于通知列表数据整体变化，适合批量更新后刷新；notifyItemRangeChanged() 用于局部范围数据变化；notifyItemChanged() 用于单个 item 数据变化；refreshAdapter() 并非 Adapter 的标准方法。因此正确答案为 A。"
+  },
+  {
+    id: 59,
+    question: "RecyclerView.Adapter 的 getItemCount() 方法返回值是？",
+    options: [
+      "A. 列表项的布局资源 ID",
+      "B. 列表的可见 item 数量",
+      "C. 数据列表的长度",
+      "D. Adapter 的版本号"
+    ],
+    answer: "C",
+    explanation: "getItemCount() 用于返回当前数据列表的总长度，RecyclerView 根据该值确定列表项数量；A 是 onCreateViewHolder() 的参数相关；B 需通过 RecyclerView 的 LayoutManager 获取；D 并非 Adapter 的核心方法返回值。因此正确答案为 C。"
+  },
+  {
+    id: 60,
+    question: "阅读以下 ConstraintLayout 布局代码，textView 的显示效果是？\n<androidx.constraintlayout.widget.ConstraintLayout\n    android:layout_width='match_parent'\n    android:layout_height='match_parent'>\n    <TextView\n        android:id='@+id/textView'\n        android:text='测试文本'\n        android:layout_width='match_parent'\n        android:layout_height='0dp'\n        app:layout_constraintTop_toTopOf='parent'\n        app:layout_constraintBottom_toBottomOf='parent'/>\n</androidx.constraintlayout.widget.ConstraintLayout>",
+    options: [
+      "A. 文本高度为 0，不可见",
+      "B. 文本高度适应内容大小",
+      "C. 文本高度填充父容器垂直空间",
+      "D. 文本高度等于父容器高度的一半"
+    ],
+    answer: "C",
+    explanation: "ConstraintLayout 中，TextView 高度设为 0dp，且同时与父容器顶部和底部建立约束，会根据约束填充垂直方向的全部空间；A 需取消约束或设置 visibility 为 GONE 才会不可见；B 是 wrap_content 的效果；D 需通过约束比例（app:layout_constraintDimensionRatio）或 guideline 实现，当前代码无相关配置。因此正确答案为 C。"
+  },
+  {
+    id: 61,
+    question: "TextView 设置'文本过长时尾部显示省略号'，需配置的属性是？",
+    options: [
+      "A. android:singleLine='true'",
+      "B. android:maxLines='1'",
+      "C. android:ellipsize='end'",
+      "D. android:lines='1'"
+    ],
+    answer: "C",
+    explanation: "android:ellipsize 属性指定文本溢出时的显示方式，end 表示尾部省略；singleLine 已过时，maxLines 和 lines 用于限制行数，需配合 ellipsize 才能显示省略号，单独配置无法实现效果。因此正确答案为 C。"
+  },
+  {
+    id: 62,
+    question: "Gson 解析泛型列表（如 List<Bean>）时，解决泛型擦除问题的工具类是？",
+    options: [
+      "A. TypeToken",
+      "B. JsonBuilder",
+      "C. JsonParser",
+      "D. TypeAdapter"
+    ],
+    answer: "A",
+    explanation: "由于泛型擦除，直接使用 List::class.java 会导致 Gson 解析错误，需通过 TypeToken 指定具体泛型类型（如 object : TypeToken<List<Bean>>() {}.type）；B 用于构建 Gson 实例并配置参数；C 用于解析 JSON 字符串为 JsonElement；D 用于自定义序列化和反序列化逻辑。因此正确答案为 A。"
+  },
+  {
+    id: 63,
+    question: "Gson 中用于将 Java 对象转换为 JSON 字符串的方法是？",
+    options: [
+      "A. fromJson()",
+      "B. parse()",
+      "C. toJson()",
+      "D. serialize()"
+    ],
+    answer: "C",
+    explanation: "Gson 的 toJson() 方法用于将对象（或集合）转换为 JSON 字符串；fromJson() 用于将 JSON 字符串转换为对象；B、D 并非 Gson 的核心转换方法。因此正确答案为 C。"
+  },
+  {
+    id: 64,
+    question: "以下代码中，Gson 解析 List<Bean> 的正确方式是？\nval json = '[{\"name\":\"a\"},{\"name\":\"b\"}]'\nval gson = Gson()",
+    options: [
+      "A. val list = gson.fromJson(json, List::class.java)",
+      "B. val list = gson.fromJson(json, Bean::class.java)",
+      "C. val type = object : TypeToken<List<Bean>>() {}.type\n   val list = gson.fromJson(json, type)",
+      "D. val list = gson.toJson(json, List::class.java)"
+    ],
+    answer: "C",
+    explanation: "由于泛型擦除，Gson 解析 List<Bean> 需通过 TypeToken 指定具体泛型类型；A 直接使用 List::class.java 会导致解析错误；B 用于解析单个 Bean 对象；D 是对象转 JSON，与解析需求相反。因此正确答案为 C。"
+  },
+  {
+    id: 65,
+    question: "数据类中，用于映射 JSON 字段名与类属性名不一致的注解是？",
+    options: [
+      "A. @SerializedName",
+      "B. @JsonField",
+      "C. @FieldName",
+      "D. @JsonKey"
+    ],
+    answer: "A",
+    explanation: "@SerializedName 是 Gson 库的注解，用于指定 JSON 字段名，解决字段名不一致问题；其他注解均非 Gson 的标准映射注解，无法实现该功能。因此正确答案为 A。"
+  },
+  {
+    id: 66,
+    question: "Android 项目中，gradle-wrapper.properties 文件的核心作用是？",
+    options: [
+      "A. 配置项目依赖库",
+      "B. 指定 Gradle 版本和下载地址",
+      "C. 启用 DataBinding 特性",
+      "D. 配置 maven 仓库地址"
+    ],
+    answer: "B",
+    explanation: "gradle-wrapper.properties 用于指定项目使用的 Gradle 版本及下载地址，确保所有开发者使用统一版本；A、C 在 app/build.gradle.kts 中配置；D 在 settings.gradle.kts 中配置。因此正确答案为 B。"
+  },
+  {
+    id: 67,
+    question: "LoadingDialog 设置 setCancelable(false) 的作用是？",
+    options: [
+      "A. 禁止触摸 Dialog 外部关闭",
+      "B. 禁止通过返回键关闭",
+      "C. 禁止 Dialog 被销毁",
+      "D. 同时禁止触摸外部和返回键关闭"
+    ],
+    answer: "B",
+    explanation: "setCancelable(false) 仅禁止通过返回键关闭 Dialog；禁止触摸外部关闭需额外调用 setCanceledOnTouchOutside(false)；C 错误，Dialog 仍可通过 dismiss() 销毁；D 是 setCancelable(false) 和 setCanceledOnTouchOutside(false) 的组合效果，非该方法单独作用。因此正确答案为 B。"
+  },
+  {
+    id: 68,
+    question: "SwipeRefreshLayout 中，控制刷新动画停止的核心属性是？",
+    options: [
+      "A. isRefreshing",
+      "B. stopRefresh",
+      "C. cancelRefresh",
+      "D. dismissRefresh"
+    ],
+    answer: "A",
+    explanation: "SwipeRefreshLayout 通过设置 isRefreshing 为 false 停止刷新动画，true 则显示动画；B、C、D 均非其标准属性或方法，无法实现刷新动画控制。因此正确答案为 A。"
+  },
+  {
+    id: 69,
+    question: "发起带 Query 参数的 GET 网络请求时，参数应拼接在？",
+    options: [
+      "A. 请求头中",
+      "B. 请求体中",
+      "C. URL 末尾",
+      "D. 表单数据中"
+    ],
+    answer: "C",
+    explanation: "GET 请求的 Query 参数需以'?key=value&key2=value2'的格式拼接在 URL 末尾；请求头用于传递请求元信息；请求体和表单数据用于 POST 请求，GET 请求不支持，URL 末尾是 GET 请求 Query 参数的唯一合法位置。因此正确答案为 C。"
+  },
+  {
+    id: 70,
+    question: "ViewModel 中通过协程加载网络数据，应优先使用的调度器是？",
+    options: [
+      "A. Dispatchers.Main",
+      "B. Dispatchers.Unconfined",
+      "C. Dispatchers.IO",
+      "D. Dispatchers.Default"
+    ],
+    answer: "C",
+    explanation: "网络请求属于 IO 密集型任务，Dispatchers.IO 调度器专门优化此类操作，提供充足线程池；主线程调度器用于更新 UI；默认调度器用于 CPU 密集型任务；无限制调度器执行线程不确定，不适合网络请求，Dispatchers.IO 是网络数据加载的最优选择。因此正确答案为 C。"
+  }
+];
+
+
+   // 内置判断题库 - 30道Kotlin/Android判断题
+        const trueFalseQuestions = [
+            {
+                id: 1,
+                question: "Kotlin 中用 val 声明的变量赋值后不可修改。",
+                answer: "正确",
+                explanation: "val 是 Kotlin 中声明不可变变量的关键字，变量赋值后其引用或值无法被修改，适用于常量、配置参数等值固定的场景，能避免意外修改带来的 bug。",
+                type: "truefalse"
+            },
+            {
+                id: 2,
+                question: "Java 和 Kotlin 的单行注释都使用 //。",
+                answer: "正确",
+                explanation: "Kotlin 在注释语法上与 Java 保持兼容，单行注释均通过 // 开头，多行注释以 /* 起始、*/ 结束，确保跨语言开发时的语法一致性。",
+                type: "truefalse"
+            },
+            {
+                id: 3,
+                question: "Kotlin 中 var 关键字用于声明不可变变量。",
+                answer: "错误",
+                explanation: "var 是 Kotlin 中声明可变变量的关键字，支持多次赋值和值的动态修改；声明不可变变量需使用 val 关键字，两者功能明确区分。",
+                type: "truefalse"
+            },
+            {
+                id: 4,
+                question: "Kotlin 不支持多行注释。",
+                answer: "错误",
+                explanation: "Kotlin 完全支持多行注释，语法与 Java 一致，以 /* 作为起始标记、*/ 作为结束标记，可用于注释多行代码或添加详细说明文档。",
+                type: "truefalse"
+            },
+            {
+                id: 5,
+                question: "可空字符串 str 获取长度时，使用 str?.length 可避免空指针异常。",
+                answer: "正确",
+                explanation: "?. 是 Kotlin 的安全调用运算符，专门用于访问可空变量的属性或方法。若 str 不为 null，正常返回长度；若为 null，表达式结果为 null，不会抛出空指针异常。",
+                type: "truefalse"
+            },
+            {
+                id: 6,
+                question: "Kotlin 的 Elvis 运算符 ?: 在左侧表达式为非 null 时返回右侧默认值。",
+                answer: "错误",
+                explanation: "Elvis 运算符 ?: 的核心逻辑是'左侧表达式为 null 时返回右侧默认值，左侧非 null 时返回左侧结果'，常与安全调用运算符配合，简化空值处理逻辑。",
+                type: "truefalse"
+            },
+            {
+                id: 7,
+                question: "不可空类型变量可以直接赋值为 null。",
+                answer: "错误",
+                explanation: "Kotlin 默认变量为不可空类型，编译期会强制校验，不允许直接赋值为 null。若需变量支持 null 值，需显式在类型后添加 ? 声明为可空类型。",
+                type: "truefalse"
+            },
+            {
+                id: 8,
+                question: "Kotlin 空安全机制的核心是类型系统区分可空与不可空类型。",
+                answer: "正确",
+                explanation: "Kotlin 空安全的核心设计是通过类型系统明确区分可空类型（带 ?）和不可空类型（默认），从编译阶段断定指针异常，无需依赖运行时额外处理。",
+                type: "truefalse"
+            },
+            {
+                id: 9,
+                question: "Lambda 表达式有且仅有一个参数时，默认参数名是 it。",
+                answer: "正确",
+                explanation: "Kotlin 为简化 Lambda 表达式写法，当表达式仅有一个参数且未显式声明参数名时，自动将该参数命名为 it，常用于控件点击事件、集合遍历等场景，精简代码量。",
+                type: "truefalse"
+            },
+            {
+                id: 10,
+                question: "Kotlin 的 listOf() 用于创建可变 List。",
+                answer: "错误",
+                explanation: "listOf() 是 Kotlin 创建不可变 List 的标准方法，创建后的集合不支持增删改操作；创建可变 List 需使用 mutableListOf()，遵循'前缀 mutable 表示可变集合'的设计规则。",
+                type: "truefalse"
+            },
+            {
+                id: 11,
+                question: "Set 集合允许添加重复元素。",
+                answer: "错误",
+                explanation: "Set 集合的核心特性是元素唯一性，不允许存储重复值。向可变 Set（如 mutableSetOf() 创建的集合）添加已存在的元素时，操作无效，集合内容保持不变。",
+                type: "truefalse"
+            },
+            {
+                id: 12,
+                question: "Map 的 getOrDefault 方法在 key 存在时返回默认值。",
+                answer: "错误",
+                explanation: "getOrDefault 是 Map 的安全获取方法，逻辑为'若 key 存在，返回该 key 对应的 value；若 key 不存在，返回传入的默认值'，避免直接调用 get(key) 返回 null 的情况。",
+                type: "truefalse"
+            },
+            {
+                id: 13,
+                question: "Kotlin 中 async 函数用于启动无返回值的协程。",
+                answer: "错误",
+                explanation: "async 函数用于启动带返回值的协程，执行后返回 Deferred 对象，需通过 await() 方法获取异步任务结果；无返回值的协程需通过 launch 函数启动，返回 Job 对象用于管理生命周期。",
+                type: "truefalse"
+            },
+            {
+                id: 14,
+                question: "协程是用户态的轻量级线程，切换成本低。",
+                answer: "正确",
+                explanation: "协程是运行在用户态的轻量级执行单元，无需操作系统内核调度，由程序或运行时库控制，上下文切换成本远低于线程，支持大量并发任务高效执行。",
+                type: "truefalse"
+            },
+            {
+                id: 15,
+                question: "Dispatchers.IO 适用于 IO 密集型任务（如网络请求、文件读写）。",
+                answer: "正确",
+                explanation: "Dispatchers.IO 是协程专门优化的 IO 调度器，基于动态扩展的线程池实现，适用于网络请求、文件读写、数据库操作等需要等待外部资源响应的 IO 密集型任务，避免阻塞主线程。",
+                type: "truefalse"
+            },
+            {
+                id: 16,
+                question: "挂起函数必须用 suspend 关键字修饰。",
+                answer: "正确",
+                explanation: "suspend 是 Kotlin 挂起函数的专属标识，用于标记支持暂停和恢复执行的函数。挂起函数执行到挂起点时会释放线程资源，操作完成后恢复执行，实现线程高效复用。",
+                type: "truefalse"
+            },
+            {
+                id: 17,
+                question: "挂起函数仅能在协程或其他挂起函数中调用。",
+                answer: "正确",
+                explanation: "挂起函数的执行依赖协程作用域，不能在普通函数中直接调用，否则会编译报错。其调用场景仅限协程内部或其他挂起函数，确保挂起机制正常运行。",
+                type: "truefalse"
+            },
+            {
+                id: 18,
+                question: "Dispatchers.Main 用于在 Android 子线程执行 UI 操作。",
+                answer: "错误",
+                explanation: "Android 的 UI 操作严格限制在主线程执行，Dispatchers.Main 是协程专门用于主线程的调度器，通过它可安全执行 TextView 更新、按钮状态修改等 UI 相关逻辑，避免线程安全问题。",
+                type: "truefalse"
+            },
+            {
+                id: 19,
+                question: "Android 中 LinearLayout 通过 orientation 属性控制子组件排列方向。",
+                answer: "正确",
+                explanation: "LinearLayout 是 Android 基础线性布局，通过 orientation 属性指定子组件排列方向，取值为 vertical（垂直）或 horizontal（水平），适用于按钮、文本框等组件的顺序排列场景。",
+                type: "truefalse"
+            },
+            {
+                id: 20,
+                question: "ImageView 是 Android 中用于显示文本的基础 UI 组件。",
+                answer: "错误",
+                explanation: "ImageView 是 Android 中用于显示图片的基础 UI 组件，支持加载本地图片、网络图片等资源；用于显示文本信息的基础组件是 TextView，可展示静态或动态文本。",
+                type: "truefalse"
+            },
+            {
+                id: 21,
+                question: "Activity 生命周期的首个回调方法是 onStart。",
+                answer: "错误",
+                explanation: "Activity 创建时首先触发的生命周期回调是 onCreate，该方法用于初始化布局（如通过 setContentView 加载布局文件）、绑定视图、初始化数据模型等核心操作，是生命周期的起点。",
+                type: "truefalse"
+            },
+            {
+                id: 22,
+                question: "Fragment 在 onCreateView 方法中完成 UI 布局的加载。",
+                answer: "正确",
+                explanation: "onCreateView 是 Fragment 加载 UI 布局的核心回调方法，通过 inflater.inflate 将布局文件转换为 View 对象并返回，是 Fragment 构建界面的必经步骤，确保布局与 Fragment 关联。",
+                type: "truefalse"
+            },
+            {
+                id: 23,
+                question: "ConstraintLayout 中，app:layout_constraintStart_toStartOf='parent' 表示控件左边缘与父布局左边缘对齐。",
+                answer: "正确",
+                explanation: "layout_constraintStart_toStartOf 是 ConstraintLayout 的水平约束属性，取值为 parent 时，代表当前控件的左边缘与父布局的左边缘对齐，是该布局中控件与父布局对齐的基础约束方式。",
+                type: "truefalse"
+            },
+            {
+                id: 24,
+                question: "Android 中设置 TextView 宽高为'匹配父布局宽度、自适应高度'时，layout_height 值为 match_parent。",
+                answer: "错误",
+                explanation: "Android 布局中，match_parent 表示控件尺寸与父布局一致，wrap_content 表示尺寸自适应内容大小。'匹配父布局宽度、自适应高度'对应的配置是 layout_width='match_parent'、layout_height='wrap_content'。",
+                type: "truefalse"
+            },
+            {
+                id: 25,
+                question: "ViewModel 独立于 Activity 旋转生命周期。",
+                answer: "正确",
+                explanation: "ViewModel 的核心特性之一是生命周期独立于 Activity 的配置变化（如屏幕旋转），Activity 旋转时 ViewModel 不会被销毁，能保留原有数据，避免数据丢失和重复初始化。",
+                type: "truefalse"
+            },
+            {
+                id: 26,
+                question: "MutableLiveData 仅支持读取数据，不支持修改。",
+                answer: "错误",
+                explanation: "LiveData 是抽象类，仅提供数据观察（读取）能力，无公开的修改方法；MutableLiveData 作为其子类，提供 setValue()（主线程）和 postValue()（子线程）方法，支持数据的读写操作。",
+                type: "truefalse"
+            },
+            {
+                id: 27,
+                question: "DataBinding 布局的根标签是 <data>。",
+                answer: "错误",
+                explanation: "DataBinding 布局必须以 <layout> 标签作为根节点，内部包含 <data> 标签（用于声明绑定变量）和具体的布局容器（如 LinearLayout、ConstraintLayout），<data> 仅负责数据声明，不承担根标签功能。",
+                type: "truefalse"
+            },
+            {
+                id: 28,
+                question: "RecyclerView 的 Adapter 用于设置列表的排列方式。",
+                answer: "错误",
+                explanation: "RecyclerView 的 Adapter 主要负责数据与列表项视图的绑定，包括创建视图持有者、填充数据、返回数据总数等；设置列表排列方式（如线性、网格）的是 LayoutManager 组件，两者职责明确区分。",
+                type: "truefalse"
+            },
+            {
+                id: 29,
+                question: "Gson 解析泛型列表时，TypeToken 可解决泛型擦除问题。",
+                answer: "正确",
+                explanation: "Java/Kotlin 中泛型在编译时会被擦除，直接使用 List::class.java 无法让 Gson 识别具体泛型类型。TypeToken 通过匿名内部类的方式保留泛型信息，明确指定 List 类型，确保解析准确。",
+                type: "truefalse"
+            },
+            {
+                id: 30,
+                question: "DataBinding 中绑定变量到 UI 控件的语法是 @{变量名}。",
+                answer: "正确",
+                explanation: "DataBinding 采用 @{变量名} 的专属语法实现数据与 UI 控件的绑定，例如 android:text='@{user.name}' 可将 user 对象的 name 属性绑定到 TextView 的文本属性，是数据绑定的核心语法规则。",
+                type: "truefalse"
+            }
+        ];
+
+        // 数据存储
+        let questions = [];
+        let currentIndex = 0;
+        let userAnswers = {};
+        let results = {};
+        
+        // DOM元素
+        const useSingleChoiceBtn = document.getElementById('useSingleChoiceBtn');
+        const useTrueFalseBtn = document.getElementById('useTrueFalseBtn');
+        const useCustomBtn = document.getElementById('useCustomBtn');
+        const useTextBtn = document.getElementById('useTextBtn');
+        const importCustomBtn = document.getElementById('importCustomBtn');
+        const importTextBtn = document.getElementById('importTextBtn');
+        const customInputArea = document.getElementById('customInputArea');
+        const textInputArea = document.getElementById('textInputArea');
+        const inputArea = document.getElementById('inputArea');
+        const textInput = document.getElementById('textInput');
+        const resetBtn = document.getElementById('resetBtn');
+        const importArea = document.getElementById('importArea');
+        const practiceArea = document.getElementById('practiceArea');
+        const questionBox = document.getElementById('questionBox');
+        const questionNav = document.getElementById('questionNav');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const showAnswerBtn = document.getElementById('showAnswerBtn');
+        const statusEl = document.getElementById('status');
+        
+        // 初始化
+        init();
+        
+        function init() {
+            useSingleChoiceBtn.addEventListener('click', () => loadQuestions(singleChoiceQuestions));
+            useTrueFalseBtn.addEventListener('click', () => loadQuestions(trueFalseQuestions));
+            useCustomBtn.addEventListener('click', () => {
+                customInputArea.style.display = 'block';
+                textInputArea.style.display = 'none';
+            });
+            useTextBtn.addEventListener('click', () => {
+                textInputArea.style.display = 'block';
+                customInputArea.style.display = 'none';
+            });
+            importCustomBtn.addEventListener('click', importCustomQuestions);
+            importTextBtn.addEventListener('click', () => {
+    showStatus('文本导入功能暂未实现', 'error');
+});
+            resetBtn.addEventListener('click', resetPractice);
+            prevBtn.addEventListener('click', showPrev);
+            nextBtn.addEventListener('click', showNext);
+            submitBtn.addEventListener('click', submitAnswer);
+            showAnswerBtn.addEventListener('click', showAnswer);
+        }
+        
+        // 加载题目
+        function loadQuestions(questionArray) {
+            if (!questionArray || questionArray.length === 0) {
+                showStatus('题库为空，请检查数据格式', 'error');
+                return;
+            }
+            
+            questions = questionArray;
+            
+            // 初始化答题状态
+            userAnswers = {};
+            results = {};
+            currentIndex = 0;
+            
+            questions.forEach((_, i) => {
+                userAnswers[i] = null;
+                results[i] = { answered: false, correct: false };
+            });
+            
+            // 切换界面
+            importArea.style.display = 'none';
+            practiceArea.style.display = 'block';
+            
+            // 更新统计
+            updateStats();
+            
+            // 显示第一题
+            showQuestion(currentIndex);
+            
+            // 生成导航
+            generateNav();
+            
+            showStatus(`成功加载${questions.length}道题目，开始练习吧！`, 'success');
+        }
+        
+        // 导入自定义JSON题库
+        function importCustomQuestions() {
+            try {
+                const jsonText = inputArea.value.trim();
+                if (!jsonText) {
+                    showStatus('请输入JSON数据', 'error');
+                    return;
+                }
+                
+                const questionArray = JSON.parse(jsonText);
+                // 确保每个题目都有type属性
+                questionArray.forEach(q => {
+                    if (!q.type) {
+                        q.type = q.options ? "single" : "truefalse";
+                    }
+                });
+                loadQuestions(questionArray);
+            } catch (error) {
+                showStatus('JSON格式错误: ' + error.message, 'error');
+            }
+        }
+        
+        // 显示题目
+        function showQuestion(index) {
+            if (index < 0 || index >= questions.length) return;
+            
+            currentIndex = index;
+            const q = questions[index];
+            
+            // 构建HTML
+            let html = `
+                <div class="question-header">
+                    <div class="question-number">第 ${index + 1} 题</div>
+                    <div class="question-type ${q.type === 'truefalse' ? 'truefalse' : 'single'}">
+                        ${q.type === 'truefalse' ? '判断题' : '单选题'}
+                    </div>
+                </div>
+                <div class="question-text"><strong>${q.question}</strong></div>
+            `;
+            
+            if (q.type === 'truefalse') {
+                // 判断题
+                let trueClass = 'true-btn';
+                let falseClass = 'false-btn';
+                const userAnswer = userAnswers[index];
+                
+                if (userAnswer !== null) {
+                    if (userAnswer === '正确') trueClass += ' selected';
+                    if (userAnswer === '错误') falseClass += ' selected';
+                    
+                    if (results[index] && results[index].answered) {
+                        if (q.answer === '正确') trueClass += ' correct';
+                        else falseClass += ' correct';
+                        
+                        if (userAnswer !== q.answer) {
+                            if (userAnswer === '正确') trueClass += ' incorrect';
+                            else falseClass += ' incorrect';
+                        }
+                    }
+                }
+                
+                html += `
+                    <div class="true-false-options">
+                        <div class="${trueClass}" data-answer="正确">✅ 正确</div>
+                        <div class="${falseClass}" data-answer="错误">❌ 错误</div>
+                    </div>
+                `;
+            } else {
+                // 单选题
+                html += '<div class="options">';
+                
+                q.options.forEach((opt, i) => {
+                    let cls = 'option';
+                    const userAnswer = userAnswers[index];
+                    const optionLetter = opt.charAt(0); // 获取选项字母
+                    
+                    if (userAnswer !== null) {
+                        if (optionLetter === userAnswer) cls += ' selected';
+                        if (results[index] && results[index].answered) {
+                            if (optionLetter === q.answer) cls += ' correct';
+                            else if (optionLetter === userAnswer && userAnswer !== q.answer) cls += ' incorrect';
+                        }
+                    }
+                    
+                    html += `<div class="${cls}" data-answer="${optionLetter}">${opt}</div>`;
+                });
+                
+                html += '</div>';
+            }
+            
+            html += `
+                <div class="explanation" id="explanation">
+                    <strong>📝 解析：</strong>${q.explanation || '暂无解析'}
+                </div>
+            `;
+            
+            questionBox.innerHTML = html;
+            
+            // 绑定选项点击
+            if (q.type === 'truefalse') {
+                document.querySelectorAll('.true-btn, .false-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        if (results[index] && results[index].answered) return;
+                        
+                        document.querySelectorAll('.true-btn, .false-btn').forEach(b => {
+                            b.classList.remove('selected');
+                        });
+                        this.classList.add('selected');
+                        
+                        userAnswers[index] = this.getAttribute('data-answer');
+                        updateSubmitBtn();
+                    });
+                });
+            } else {
+                document.querySelectorAll('.option').forEach(opt => {
+                    opt.addEventListener('click', function() {
+                        if (results[index] && results[index].answered) return;
+                        
+                        document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                        this.classList.add('selected');
+                        
+                        userAnswers[index] = this.getAttribute('data-answer');
+                        updateSubmitBtn();
+                    });
+                });
+            }
+            
+            // 更新UI
+            updateNavButtons();
+            updateSubmitBtn();
+            updateNavHighlight();
+            document.getElementById('explanation').style.display = 'none';
+        }
+        
+        // 更新导航按钮
+        function updateNavButtons() {
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === questions.length - 1;
+        }
+        
+        // 更新提交按钮
+        function updateSubmitBtn() {
+            if (results[currentIndex] && results[currentIndex].answered) {
+                submitBtn.textContent = '已提交';
+                submitBtn.disabled = true;
+            } else {
+                submitBtn.textContent = '提交答案';
+                submitBtn.disabled = userAnswers[currentIndex] === null;
+            }
+        }
+        
+        // 更新导航高亮
+        function updateNavHighlight() {
+            const btns = document.querySelectorAll('.nav-btn');
+            btns.forEach((btn, i) => {
+                btn.classList.remove('current');
+                if (i === currentIndex) btn.classList.add('current');
+            });
+        }
+        
+        // 生成导航
+        function generateNav() {
+            questionNav.innerHTML = '';
+            
+            for (let i = 0; i < questions.length; i++) {
+                const btn = document.createElement('div');
+                btn.className = 'nav-btn';
+                btn.textContent = i + 1;
+                
+                if (results[i] && results[i].answered) {
+                    btn.classList.add(results[i].correct ? 'answered' : 'incorrect');
+                }
+                
+                if (i === currentIndex) {
+                    btn.classList.add('current');
+                }
+                
+                btn.addEventListener('click', () => showQuestion(i));
+                questionNav.appendChild(btn);
+            }
+        }
+        
+        // 上一题
+        function showPrev() {
+            if (currentIndex > 0) showQuestion(currentIndex - 1);
+        }
+        
+        // 下一题
+        function showNext() {
+            if (currentIndex < questions.length - 1) showQuestion(currentIndex + 1);
+        }
+        
+        // 提交答案
+        function submitAnswer() {
+            const q = questions[currentIndex];
+            const userAnswer = userAnswers[currentIndex];
+            
+            if (userAnswer === null) {
+                showStatus('请先选择答案', 'error');
+                return;
+            }
+            
+            const correct = userAnswer === q.answer;
+            results[currentIndex] = { answered: true, correct: correct };
+            
+            // 重新显示
+            showQuestion(currentIndex);
+            
+            // 显示解析
+            document.getElementById('explanation').style.display = 'block';
+            
+            // 更新统计和导航
+            updateStats();
+            generateNav();
+            
+            // 显示结果
+            if (correct) {
+                showStatus('✅ 回答正确！', 'success');
+            } else {
+                showStatus(`❌ 回答错误！正确答案是：${q.answer}`, 'error');
+            }
+        }
+        
+        // 显示答案
+        function showAnswer() {
+            const q = questions[currentIndex];
+            document.getElementById('explanation').style.display = 'block';
+            showStatus(`正确答案：${q.answer}`, 'success');
+        }
+        
+        // 更新统计
+        function updateStats() {
+            let answered = 0, correct = 0;
+            
+            for (let i = 0; i < questions.length; i++) {
+                if (results[i] && results[i].answered) {
+                    answered++;
+                    if (results[i].correct) correct++;
+                }
+            }
+            
+            document.getElementById('totalQuestions').textContent = questions.length;
+            document.getElementById('answeredQuestions').textContent = answered;
+            document.getElementById('correctAnswers').textContent = correct;
+            
+            const accuracy = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+            document.getElementById('accuracyRate').textContent = accuracy + '%';
+        }
+        
+        // 重置练习
+        function resetPractice() {
+            if (confirm('确定要重新开始吗？当前进度将丢失。')) {
+                practiceArea.style.display = 'none';
+                importArea.style.display = 'block';
+                customInputArea.style.display = 'none';
+                textInputArea.style.display = 'none';
+                
+                questions = [];
+                userAnswers = {};
+                results = {};
+                currentIndex = 0;
+                
+                showStatus('', '');
+            }
+        }
+        
+        // 显示状态
+        function showStatus(msg, type) {
+            statusEl.textContent = msg;
+            statusEl.className = 'status ' + (type === 'success' ? 'success' : type === 'error' ? 'error' : '');
+            
+            if (msg) {
+                setTimeout(() => {
+                    statusEl.textContent = '';
+                    statusEl.className = 'status';
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>

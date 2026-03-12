@@ -188,6 +188,15 @@
 watch(() => isAiTyping.value, (newVal) => {<br>  if (!newVal) parseIntent(aiContent.value);<br>});<br><br>function parseIntent(text) {<br>  requestIdleCallback(() => {<br>    const keywords = ['小轮','巴士','铜锣湾'];<br>    activeTools.value = keywords.filter(kw => text.includes(kw));<br>  }, { timeout: 1000 });<br>}
                 </div>
                 <p>使用 <code>requestIdleCallback</code> 空闲扫描，保证60fps，降级用 setTimeout。</p>
+                <p>目标：在AI回复完成后，扫描文本中的关键词（如“天星小轮”“铜锣湾”），决定是否显示快捷图标。
+
+技术细节：
+
+监听AI状态：使用watch监听一个布尔值isAiTyping，当变为false时触发扫描。
+
+扫描函数：用正则或includes检测关键词，将匹配到的工具存入响应式数组activeTools。
+
+性能优化：使用requestIdleCallback或setTimeout延迟执行，避免阻塞UI渲染。如果支持Web Worker，可以将扫描逻辑放到Worker中，但简单场景下requestIdleCallback足够。</p>
 
                 <div class="card-sub">🎯 2. 动态图标栏渲染</div>
                 <div class="code">
@@ -208,6 +217,15 @@ const toolConfig = {<br>  小轮: { icon: 'ferry-icon', label:'实时轮渡', pa
                 <div class="code">
 // store/travel.js<br>export const useTravelStore = defineStore('travel', {<br>  state: () => ({ savedItineraries: [] }),<br>  actions: {<br>    saveItinerary(it) {<br>      this.savedItineraries.push({ id: Date.now(), ...it });<br>      localStorage.setItem('saved', JSON.stringify(this.savedItineraries));<br>    },<br>    loadFromStorage() {<br>      const saved = localStorage.getItem('saved');<br>      if (saved) this.savedItineraries = JSON.parse(saved);<br>    }<br>  }<br>});<br>// 应用启动时调用 loadFromStorage
                 </div>
+                <p>目标：将AI规划的行程转换为可保存的卡片，并存入“我的”页面。
+
+技术细节：
+
+数据结构设计：行程步骤数组，每个步骤包含地点、交通方式、时间等。
+
+解析AI回复：如果后端返回结构化数据最好；否则前端需用正则提取。简单场景可假设后端已提供JSON。
+
+动态组件渲染看板：在AI回复下方插入一个自定义组件，接收行程数据</p>
 
                 <div class="card-sub">⚡ 6. 性能优化技巧</div>
                 <ul>

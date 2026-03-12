@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>天使聚量·前端实习面试手册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        /* 主内容区域 - 滚动 */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 12px 8px 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+        /* 底部 Tab 栏 */
+        .tabbar {
+            height: 64px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            border-top: 1px solid #e9ecf0;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.02);
+            flex-shrink: 0;
+        }
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #8695a8;
+            transition: color 0.2s;
+            padding: 8px 0;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        .tab-item.active {
+            color: #1e7b8c;
+            font-weight: 500;
+        }
+        .tab-item i {
+            font-size: 22px;
+            margin-bottom: 2px;
+            font-style: normal;
+        }
+        /* 卡片样式 */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 18px 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            border: 1px solid #edf2f7;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0b2b3b;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1.5px dashed #cbd5e0;
+        }
+        .card-sub {
+            font-weight: 600;
+            font-size: 16px;
+            margin: 16px 0 8px 0;
+            color: #1d4e67;
+        }
+        p, li {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #2d3f4f;
+            margin-bottom: 8px;
+        }
+        .highlight {
+            background-color: #f0f9fc;
+            border-left: 4px solid #1e7b8c;
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin: 12px 0;
+        }
+        .code {
+            background-color: #f1f5f9;
+            padding: 12px 14px;
+            border-radius: 14px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 12px 0;
+            border: 1px solid #e2e8f0;
+        }
+        .badge {
+            display: inline-block;
+            background: #e0f2f5;
+            color: #115e6b;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #e2e8f0;
+            margin: 20px 0;
+        }
+        ul, ol {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+        li {
+            margin-bottom: 6px;
+        }
+        .note {
+            background: #fef9e7;
+            border-radius: 16px;
+            padding: 14px;
+            color: #7b5e2c;
+            font-size: 14px;
+            border-left: 4px solid #f5b342;
+        }
+        /* 隐藏所有tab内容，默认显示第一个 */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        /* 模拟图标 */
+        .emoji-icon {
+            font-size: 22px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 主要内容区域（4个tab） -->
+    <div class="content" id="contentArea">
+        <!-- 逐字稿 tab -->
+        <div id="tab1" class="tab-content active">
+            <div class="card">
+                <div class="card-title">📝 完整逐字稿（直接背）</div>
+                <p><strong>🎙️ 开场：</strong>罗经理您好！我是来面试前端开发实习的XXX，非常感谢您给我这次沟通机会。</p>
+                <div class="highlight">
+                    <p><strong>🧑‍💻 自我介绍：</strong>我是2026届应届生，专注前端开发，<strong>精通HTML5、CSS3、JavaScript，熟悉Vue3和MVVM架构</strong>，能做页面开发、组件封装、路由跳转与接口联调。表达沟通良好，进取心强，能参与需求分析和技术文档撰写。了解过咱们zoihk、subfeeds等出海产品，对出海业务非常感兴趣，保证每周4-5天到岗，希望争取转正。</p>
+                </div>
+                <p><strong>📱 产品体验+优化方案：</strong>深度体验zoihk AI助手，发现AI与出行模块割裂。提出<strong>端内功能深度联动</strong>：非阻塞关键词识别 → 动态弹出快捷入口 → 用Vue3+Pinia做跨页面数据共享 → 路由传参跳转后自动定位/展开卡片。能输出需求分析和技术文档，符合WEB/H5研发要求。</p>
+                <p><strong>⚙️ 技术能力匹配：</strong></p>
+                <ul>
+                    <li><strong>MVVM与Vue：</strong>熟悉MVVM思想，用Vue3组件化开发，能实现zoihk列表卡片交互。</li>
+                    <li><strong>浏览器兼容：</strong>Chrome DevTools调试，了解主流差异，保证多设备显示。</li>
+                    <li><strong>性能优化：</strong>路由懒加载、非阻塞解析(requestIdleCallback)、组件复用。</li>
+                    <li><strong>广告经验：</strong>目前无直接经验，但前端性能、加载速度相通，能快速学习落地。</li>
+                </ul>
+                <p><strong>🎯 职业规划：</strong>短期参与zoihk研发上手技术栈；中期独立负责模块，积累出海经验；长期转正深耕出海，甚至学习广告平台开发。</p>
+                <p><strong>❓ 转正提问：</strong>请问实习表现优秀的话，是否有转正机会？转正标准是什么？</p>
+                <p><strong>🙋 反问HR：</strong>1.团队前端技术栈？2.实习生负责页面还是功能模块？3.能否快速参与真实需求迭代？有导师带吗？</p>
+                <p><strong>👋 结尾：</strong>非常希望能加入团队，把前端能力用在zoihk等出海产品上，稳定实习、争取转正，和公司一起成长。谢谢罗经理！</p>
+                <div class="note">✅ 最后提醒：提到“HTML5/CSS3/JS、Vue、需求分析”关键词；强调每周4-5天；不会的技术说“学习很快，能快速用到项目里”。</div>
+            </div>
+        </div>
+
+        <!-- 技术细节 tab -->
+        <div id="tab2" class="tab-content">
+            <div class="card">
+                <div class="card-title">⚙️ 技术实现细节（含代码）</div>
+                
+                <div class="card-sub">🔍 1. 意图解析（非阻塞扫描）</div>
+                <div class="code">
+watch(() => isAiTyping.value, (newVal) => {<br>  if (!newVal) parseIntent(aiContent.value);<br>});<br><br>function parseIntent(text) {<br>  requestIdleCallback(() => {<br>    const keywords = ['小轮','巴士','铜锣湾'];<br>    activeTools.value = keywords.filter(kw => text.includes(kw));<br>  }, { timeout: 1000 });<br>}
+                </div>
+                <p>使用 <code>requestIdleCallback</code> 空闲扫描，保证60fps，降级用 setTimeout。</p>
+
+                <div class="card-sub">🎯 2. 动态图标栏渲染</div>
+                <div class="code">
+const toolConfig = {<br>  小轮: { icon: 'ferry-icon', label:'实时轮渡', path:'/ferry' },<br>  巴士: { icon: 'bus-icon', label:'巴士到站', path:'/bus' },<br>  铜锣湾:{ icon: 'mtr-icon', label:'港铁详情', path:'/mtr' }<br>};<br><br>&lt;div class="action-bar"&gt;<br>  &lt;div v-for="tool in activeTools" @click="jumpTo(tool)"&gt;<br>    &lt;img :src="toolConfig[tool].icon" /&gt;<br>    &lt;span&gt;{{ toolConfig[tool].label }}&lt;/span&gt;<br>  &lt;/div&gt;<br>&lt;/div&gt;
+                </div>
+
+                <div class="card-sub">🚀 3. 跨页面传参与自动触发</div>
+                <div class="code">
+// 跳转时携带参数<br>router.push({ path: '/mtr', query: { station: '铜锣湾' } });<br><br>// 目标页面接收 (onMounted)<br>onMounted(() => {<br>  const { station } = route.query;<br>  if (station) { searchVal = station; fetchDetail(); }<br>});<br><br>// 组件复用监听<br>watch(() => route.query, (newQuery) => {<br>  if (newQuery.station) reSearch();<br>});
+                </div>
+
+                <div class="card-sub">📌 4. 自动展开卡片 + 滚动</div>
+                <div class="code">
+&lt;div v-for="s in stations" :ref="setStationRef" :data-id="s.id"&gt;...<br><br>const stationRefs = [];<br>const setStationRef = el => el && stationRefs.push(el);<br><br>function scrollToStation(id) {<br>  const target = stationRefs.find(el => el.dataset.id == id);<br>  if (target) {<br>    target.scrollIntoView({ behavior: 'smooth' });<br>    // 同时展开卡片 (修改expanded状态)<br>  }<br>}
+                </div>
+
+                <div class="card-sub">💾 5. 行程看板 + Pinia持久化</div>
+                <div class="code">
+// store/travel.js<br>export const useTravelStore = defineStore('travel', {<br>  state: () => ({ savedItineraries: [] }),<br>  actions: {<br>    saveItinerary(it) {<br>      this.savedItineraries.push({ id: Date.now(), ...it });<br>      localStorage.setItem('saved', JSON.stringify(this.savedItineraries));<br>    },<br>    loadFromStorage() {<br>      const saved = localStorage.getItem('saved');<br>      if (saved) this.savedItineraries = JSON.parse(saved);<br>    }<br>  }<br>});<br>// 应用启动时调用 loadFromStorage
+                </div>
+
+                <div class="card-sub">⚡ 6. 性能优化技巧</div>
+                <ul>
+                    <li><strong>markRaw</strong>：对 toolConfig 静态配置使用 <code>markRaw</code> 避免响应式转换。</li>
+                    <li><strong>路由懒加载</strong>：<code>const FerryPage = () => import('@/views/FerryPage.vue')</code></li>
+                    <li><strong>错误处理</strong>：关键词匹配失败时展示通用搜索按钮。</li>
+                </ul>
+                <p class="badge">💡 实习面试能说出 requestIdleCallback 和 Pinia 已经很棒！</p>
+            </div>
+        </div>
+
+        <!-- 面试问答 tab -->
+        <div id="tab3" class="tab-content">
+            <div class="card">
+                <div class="card-title">❓ 预想面试问答</div>
+                <div class="card-sub">🔹 技术类</div>
+                <ul>
+                    <li><strong>Q: requestIdleCallback 是什么？</strong> A: 浏览器空闲时执行任务，不影响动画/交互，降级用 setTimeout。</li>
+                    <li><strong>Q: 组件复用如何保证自动搜索？</strong> A: 同时监听 onMounted 和 route.query 的 watch。</li>
+                    <li><strong>Q: Pinia 和 Vuex 区别？</strong> A: Pinia 无 mutations，TS 支持好，多 store 友好。</li>
+                    <li><strong>Q: 数据持久化怎么做？</strong> A: localStorage + Pinia 初始化读取，或用插件 persistedstate。</li>
+                    <li><strong>Q: 地点匹配不到怎么办？</strong> A: 相似度阈值控制，低于阈值只展示通用搜索按钮。</li>
+                    <li><strong>Q: query 和 params 区别？</strong> A: query 显示在 URL（可分享），params 不显示（刷新丢失）。</li>
+                    <li><strong>Q: 滚动流畅性？</strong> A: scrollIntoView({ behavior: 'smooth' }) + 先展开卡片。</li>
+                </ul>
+                <div class="card-sub">🔹 综合/动机类</div>
+                <ul>
+                    <li><strong>Q: 为什么来我们公司？</strong> A: 出海业务感兴趣，主动体验 zoihk 并思考优化，希望深入实践。</li>
+                    <li><strong>Q: 基础薄弱如何胜任？</strong> A: 学习能力强（举例 zoihk 自学 Vue），解决问题主动。</li>
+                    <li><strong>Q: 怎么学习前端？</strong> A: 官方文档、B站、动手做小项目（待办、仿站、笔记）。</li>
+                    <li><strong>Q: 加班看法？</strong> A: 项目需要积极配合，同时提高效率，重点在成长。</li>
+                    <li><strong>Q: 职业规划？</strong> A: 短期实习打基础，中期独立负责，长期转正深耕出海。</li>
+                </ul>
+                <div class="card-sub">🔹 开放类</div>
+                <ul>
+                    <li><strong>Q: 方案与现有代码冲突？</strong> A: 先理解意图，和团队讨论，调整方案保持一致性。</li>
+                    <li><strong>Q: 遇到难题怎么解决？</strong> A: 自己搜索（Google/SO）→ 写demo → 整理后请教同事。</li>
+                    <li><strong>Q: 还有什么想问？</strong> A: 参与产品、技术栈、导师制、出海挑战等。</li>
+                </ul>
+                <hr>
+                <p>📌 <strong>Q15 备选：</strong>“实习生入职后参与哪个产品？技术栈Vue还是React？有导师带吗？出海前端挑战？”</p>
+            </div>
+        </div>
+
+        <!-- 准备清单 tab -->
+        <div id="tab4" class="tab-content">
+            <div class="card">
+                <div class="card-title">📋 面试前准备清单</div>
+                <p><strong>✅ 核心优势（反复强调）</strong><br>深度体验zoihk + 主动提出优化思路 + 技术预研（Vue路由/Pinia）</p>
+                <p><strong>🏢 公司业务速记</strong><br>移动出海、数字内容分发、东南亚/欧洲市场、zoihk(香港出行)/subfeeds(订阅)/screenmural(壁纸)。前端角色：界面本地化、用户体验、性能。</p>
+                <p><strong>📚 基础概念复习</strong><br>Vue生命周期(created/mounted)、组件通信(props/emit/pinia)、响应式原理、flex、跨域(CORS/代理)、Git基本命令。</p>
+                <p><strong>❓ 向HR提问（加分）</strong></p>
+                <ul>
+                    <li>团队前端技术栈？Vue还是React？有TypeScript吗？</li>
+                    <li>实习生负责维护还是新功能？</li>
+                    <li>培养方式？有导师带吗？</li>
+                    <li>出海产品的前端挑战（多语言、网络优化）？</li>
+                </ul>
+                <div class="note">
+                    <strong>⚠️ 最后叮嘱</strong><br>
+                    • 设备：手机信号好、安静、耳机、纸笔<br>
+                    • 语速适中，态度积极<br>
+                    • 不会的就说：“目前接触不多，但学习能力强，之前自学Vue也是通过项目快速上手的，相信能很快用到项目里。”
+                </div>
+                <p>🧘 心态：双向沟通，自信表达，你已经比很多人多走了几步！</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部 Tabbar -->
+    <div class="tabbar">
+        <button class="tab-item active" data-tab="tab1"><i>📝</i><span>逐字稿</span></button>
+        <button class="tab-item" data-tab="tab2"><i>⚙️</i><span>技术细节</span></button>
+        <button class="tab-item" data-tab="tab3"><i>❓</i><span>问答</span></button>
+        <button class="tab-item" data-tab="tab4"><i>📋</i><span>准备</span></button>
+    </div>
+
+    <script>
+        (function() {
+            const tabs = document.querySelectorAll('.tab-item');
+            const contents = {
+                tab1: document.getElementById('tab1'),
+                tab2: document.getElementById('tab2'),
+                tab3: document.getElementById('tab3'),
+                tab4: document.getElementById('tab4')
+            };
+
+            // 切换tab函数
+            function switchTab(tabId) {
+                // 隐藏所有内容
+                Object.values(contents).forEach(c => c.classList.remove('active'));
+                // 显示选中内容
+                if (contents[tabId]) contents[tabId].classList.add('active');
+                
+                // 更新按钮激活状态
+                tabs.forEach(btn => {
+                    const btnTab = btn.getAttribute('data-tab');
+                    if (btnTab === tabId) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+
+            // 绑定点击事件
+            tabs.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tabId = btn.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+
+            // 默认激活tab1 (已经激活)
+        })();
+    </script>
+    <!-- 确保手机端点击不产生灰色背景 -->
+    <style>
+        .tab-item { -webkit-tap-highlight-color: transparent; }
+    </style>
+</body>
+</html>

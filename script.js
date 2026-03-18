@@ -90,7 +90,7 @@ const translations = {
         project3Desc: "使用AI（DeepSeek）生成Python + PyQt5原型，并负责测试与迭代<br>实现多标签管理、定时刷新、Cookie保持、随机延迟等功能<br>通过社交平台收集用户反馈，推动3个版本迭代<br>优化倒计时显示与配置保存，提升用户体验",
         // 新项目4
         project4Title: "VibeCoding 练习仓库 (原生HTML/JS/CSS)",
-        project4Desc: "开发多个交互式网页应用（俄罗斯方块、题库系统、学习计时器）<br>实现碰撞检测、分数系统、本地存储等核心逻辑<br>构建可配置题库系统，支持实时计分与结果统计<br>使用 GitHub Pages + Cloudflare 部署至个人域名",
+        project4Desc: "开发多个交互式网页应用（俄罗斯方块、题库系统、学习计时器）<br>实现碰撞检测、分数系统、本地存储等核心逻辑<br>构建可配置题库系统，支持实时计分与结果统计<br>使用 GitHub Pages + Cloudflare 部署至个人域名<br><p style='text-align: right; font-weight: 300;'>点击体验→</p>",
         // 新项目5
         project5Title: "多平台UI/应用开发集",
         project5Desc: "在Android（Java）、鸿蒙（ArkTS）及Web实现待办应用<br>复现微信与京东UI，掌握布局与组件设计<br>在鸿蒙应用中接入大模型API，实现智能问答<br>开发微信小程序，使用云开发数据库与云函数"

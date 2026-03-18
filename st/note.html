@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>📦 简约·文件记事本</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #f2f0eb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .paper {
+            max-width: 750px;
+            width: 100%;
+            background: #ffffffdd;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 32px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+            padding: 28px 24px;
+            border: 1px solid #ffffff;
+        }
+
+        h1 {
+            font-size: 2.0rem;
+            font-weight: 440;
+            color: #2c3e4f;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            letter-spacing: -0.3px;
+            border-left: 5px solid #9bb8d4;
+            padding-left: 20px;
+        }
+
+        h1 small {
+            font-size: 0.9rem;
+            font-weight: 380;
+            color: #5f7d9c;
+            margin-left: auto;
+        }
+
+        /* 输入卡片 */
+        .compose-card {
+            background: #f8f9fc;
+            border-radius: 28px;
+            padding: 22px;
+            margin-bottom: 28px;
+            border: 1px solid #e7ecf2;
+            box-shadow: inset 0 2px 4px #ffffff, 0 6px 12px rgba(0,0,0,0.02);
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 16px 18px;
+            border: none;
+            background: white;
+            border-radius: 26px;
+            font-size: 1.05rem;
+            resize: vertical;
+            min-height: 80px;
+            border: 1px solid #dde3ea;
+            outline: none;
+            transition: 0.15s;
+            margin-bottom: 18px;
+            font-weight: 350;
+        }
+
+        .text-input:focus {
+            border-color: #9aaec2;
+            box-shadow: 0 0 0 3px rgba(154, 174, 194, 0.2);
+        }
+
+        /* 文件操作栏 */
+        .file-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .file-label {
+            background: #e7edf5;
+            color: #1f3a57;
+            padding: 12px 26px;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #cbd7e4;
+            transition: 0.1s;
+            font-weight: 480;
+        }
+
+        .file-label:hover {
+            background: #d9e2ed;
+            border-color: #9cb3c9;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .selected-files {
+            font-size: 0.95rem;
+            color: #4e6580;
+            background: #ffffff;
+            padding: 8px 18px;
+            border-radius: 40px;
+            border: 1px dashed #b2c4d8;
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .add-btn {
+            background: #2e4c6b;
+            border: none;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: 480;
+            margin-left: auto;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 6px 14px rgba(35, 60, 85, 0.2);
+        }
+
+        .add-btn:hover {
+            background: #1d364b;
+            transform: scale(0.97);
+        }
+
+        /* 笔记列表 */
+        .notes-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-height: 460px;
+            overflow-y: auto;
+            padding-right: 8px;
+            margin: 20px 0 16px;
+        }
+
+        .note-item {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 20px;
+            border: 1px solid #eaeef3;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            transition: 0.15s;
+        }
+
+        .note-item:hover {
+            border-color: #cbdbe9;
+            box-shadow: 0 8px 22px rgba(45, 65, 85, 0.08);
+        }
+
+        .note-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .note-text {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: #1d2c3b;
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: #f6f9ff;
+            padding: 14px 18px;
+            border-radius: 22px;
+            width: fit-content;
+            max-width: 100%;
+            border: 1px solid #e0e9f2;
+        }
+
+        .delete-note {
+            background: transparent;
+            border: none;
+            font-size: 1.8rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8f9fb1;
+            cursor: pointer;
+            transition: 0.1s;
+            flex-shrink: 0;
+        }
+
+        .delete-note:hover {
+            background: #fae8e3;
+            color: #b5533a;
+        }
+
+        /* 附件列表 */
+        .attachments {
+            margin-top: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #f5f7fb;
+            border-radius: 50px;
+            padding: 8px 16px 8px 12px;
+            border: 1px solid #dde5ef;
+        }
+
+        .file-icon {
+            font-size: 1.8rem;
+            line-height: 1;
+            width: 36px;
+            text-align: center;
+        }
+
+        .file-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: #1e3a5f;
+            word-break: break-word;
+            font-size: 1rem;
+        }
+
+        .file-size {
+            font-size: 0.8rem;
+            color: #7b8da0;
+            margin-left: 8px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .download-btn {
+            background: #dce6f0;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            color: #1d3d5c;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.1s;
+            border: 1px solid #bccfde;
+            text-decoration: none;
+        }
+
+        .download-btn:hover {
+            background: #c2d2e5;
+        }
+
+        /* 图片预览在附件里作为缩略图 */
+        .image-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 18px;
+            background: #d9e2ed;
+            border: 1px solid white;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 50px 20px;
+            background: #f8fafd;
+            border-radius: 50px;
+            color: #8fa0b5;
+            border: 2px dashed #ccdbea;
+        }
+
+        .footer-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid #dfe7f0;
+            color: #506680;
+            font-size: 0.95rem;
+        }
+
+        .clear-btn {
+            background: none;
+            border: 1px solid #c0d0e0;
+            padding: 8px 28px;
+            border-radius: 36px;
+            color: #3f5b79;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .clear-btn:hover {
+            background: #e5edf6;
+            border-color: #97aec9;
+        }
+
+        /* 滚动条 */
+        .notes-container::-webkit-scrollbar {
+            width: 5px;
+        }
+        .notes-container::-webkit-scrollbar-track {
+            background: #e5ecf3;
+            border-radius: 10px;
+        }
+        .notes-container::-webkit-scrollbar-thumb {
+            background: #adc2d9;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="paper">
+        <h1>
+            📋 便签·文件盒
+            <small>图片/文件·上传下载</small>
+        </h1>
+
+        <div class="compose-card">
+            <textarea class="text-input" id="noteText" placeholder="写点文字备注（可选）……" rows="2"></textarea>
+
+            <div class="file-toolbar">
+                <label class="file-label" for="file-input">📎 选择文件/图片</label>
+                <input type="file" id="file-input" multiple accept="*/*">
+                <span class="selected-files" id="fileNames">未选择任何文件</span>
+                <button class="add-btn" id="addNoteBtn">➕ 添加笔记</button>
+            </div>
+        </div>
+
+        <!-- 笔记列表区域 -->
+        <div class="notes-container" id="notesContainer"></div>
+
+        <div class="footer-bar">
+            <span id="stats">📄 0 条笔记 · 0 个附件</span>
+            <button class="clear-btn" id="clearAllBtn">🧹 清空全部</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // 存储键名
+            const STORAGE_KEY = 'file_notes_v2';
+
+            // 示例数据 (空)
+            const defaultNotes = [];
+
+            // 从localStorage加载
+            function loadNotes() {
+                try {
+                    const stored = localStorage.getItem(STORAGE_KEY);
+                    if (stored) {
+                        const parsed = JSON.parse(stored);
+                        return Array.isArray(parsed) ? parsed : defaultNotes;
+                    }
+                } catch (e) {
+                    console.warn('读取失败，使用空数据');
+                }
+                return defaultNotes;
+            }
+
+            // 保存
+            function saveNotes(notes) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+            }
+
+            // 辅助: 转义HTML
+            function escapeHtml(unsafe) {
+                return unsafe.replace(/[&<>"]/g, function(m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    if (m === '"') return '&quot;';
+                    return m;
+                });
+            }
+
+            // 格式化文件大小
+            function formatSize(bytes) {
+                if (bytes < 1024) return bytes + ' B';
+                if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+                return (bytes / 1048576).toFixed(1) + ' MB';
+            }
+
+            // 获取文件图标 (根据类型)
+            function getFileIcon(mime, name) {
+                if (mime.startsWith('image/')) return '🖼️';
+                const ext = name.split('.').pop()?.toLowerCase();
+                if (['pdf'].includes(ext)) return '📘';
+                if (['doc', 'docx'].includes(ext)) return '📃';
+                if (['xls', 'xlsx'].includes(ext)) return '📊';
+                if (['ppt', 'pptx'].includes(ext)) return '📽️';
+                if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) return '🗜️';
+                if (['mp3', 'wav', 'flac'].includes(ext)) return '🎵';
+                if (['mp4', 'mov', 'avi'].includes(ext)) return '🎬';
+                if (['js', 'py', 'html', 'css', 'json'].includes(ext)) return '📄';
+                return '📎';
+            }
+
+            // 当前选择的文件列表 (数组，每个元素包含: file对象, dataUrl, name, size, type)
+            let selectedFiles = [];
+
+            // DOM 元素
+            const noteTextarea = document.getElementById('noteText');
+            const fileInput = document.getElementById('file-input');
+            const fileNamesSpan = document.getElementById('fileNames');
+            const addBtn = document.getElementById('addNoteBtn');
+            const container = document.getElementById('notesContainer');
+            const statsSpan = document.getElementById('stats');
+            const clearAllBtn = document.getElementById('clearAllBtn');
+
+            // 更新选中的文件显示
+            function updateFileNames() {
+                if (selectedFiles.length === 0) {
+                    fileNamesSpan.textContent = '未选择任何文件';
+                } else {
+                    const names = selectedFiles.map(f => f.name).join('、');
+                    fileNamesSpan.textContent = names.length > 40 ? names.slice(0, 40) + '…' : names;
+                }
+            }
+
+            // 处理文件选择 (读取为DataURL)
+            fileInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                if (files.length === 0) {
+                    selectedFiles = [];
+                    updateFileNames();
+                    return;
+                }
+
+                // 限制单个文件大小 4MB，避免localStorage溢出 (可自行调整)
+                const MAX_SIZE = 4 * 1024 * 1024; // 4MB
+                let oversized = false;
+                for (let f of files) {
+                    if (f.size > MAX_SIZE) {
+                        alert(`文件 "${f.name}" 超过4MB，请选择更小的文件。`);
+                        oversized = true;
+                        break;
+                    }
+                }
+                if (oversized) {
+                    fileInput.value = ''; // 清空
+                    selectedFiles = [];
+                    updateFileNames();
+                    return;
+                }
+
+                // 读取所有文件为 DataURL
+                const readers = files.map(file => {
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                            resolve({
+                                name: file.name,
+                                size: file.size,
+                                type: file.type,
+                                dataUrl: ev.target.result
+                            });
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                });
+
+                Promise.all(readers).then(fileDataArray => {
+                    selectedFiles = fileDataArray;
+                    updateFileNames();
+                }).catch(err => {
+                    alert('读取文件失败');
+                    selectedFiles = [];
+                    updateFileNames();
+                });
+            });
+
+            // 清空当前选择的文件
+            function clearSelectedFiles() {
+                selectedFiles = [];
+                fileInput.value = '';
+                updateFileNames();
+            }
+
+            // 数据
+            let notes = loadNotes();
+
+            // 渲染笔记列表
+            function render() {
+                if (notes.length === 0) {
+                    container.innerHTML = `<div class="empty-message">📭 暂无笔记，上传文件或写点什么吧</div>`;
+                } else {
+                    let html = '';
+                    notes.forEach(note => {
+                        const noteId = note.id;
+                        const textEscaped = escapeHtml(note.text || '');
+
+                        // 渲染附件
+                        let attachmentsHtml = '';
+                        if (note.attachments && note.attachments.length > 0) {
+                            attachmentsHtml = '<div class="attachments">';
+                            note.attachments.forEach(att => {
+                                const fileName = att.name;
+                                const fileSize = formatSize(att.size);
+                                const fileType = att.type || '';
+                                const icon = getFileIcon(fileType, fileName);
+                                const dataUrl = att.dataUrl; // 已经转义? 用在src和href需要安全处理
+
+                                // 对图片特殊处理：显示缩略图
+                                if (fileType.startsWith('image/')) {
+                                    attachmentsHtml += `
+                                        <div class="attachment-item">
+                                            <img class="image-thumb" src="${escapeHtml(dataUrl)}" alt="thumb">
+                                            <div class="file-info">
+                                                <span class="file-name">${escapeHtml(fileName)}</span>
+                                                <span class="file-size">${fileSize}</span>
+                                            </div>
+                                            <div class="file-actions">
+                                                <a class="download-btn" href="${escapeHtml(dataUrl)}" download="${escapeHtml(fileName)}" title="下载">⬇️ 下载</a>
+                                            </div>
+                                        </div>
+                                    `;
+                                } else {
+                                    attachmentsHtml += `
+                                        <div class="attachment-item">
+                                            <span class="file-icon">${icon}</span>
+                                            <div class="file-info">
+                                                <span class="file-name">${escapeHtml(fileName)}</span>
+                                                <span class="file-size">${fileSize}</span>
+                                            </div>
+                                            <div class="file-actions">
+                                                <a class="download-btn" href="${escapeHtml(dataUrl)}" download="${escapeHtml(fileName)}" title="下载">⬇️ 下载</a>
+                                            </div>
+                                        </div>
+                                    `;
+                                }
+                            });
+                            attachmentsHtml += '</div>';
+                        }
+
+                        html += `
+                            <div class="note-item" data-id="${noteId}">
+                                <div class="note-header">
+                                    <div class="note-text">${textEscaped || '<span style="opacity:0.5;">(无文字备注)</span>'}</div>
+                                    <button class="delete-note" data-id="${noteId}" title="删除笔记">🗑️</button>
+                                </div>
+                                ${attachmentsHtml}
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                }
+
+                // 更新统计
+                const totalNotes = notes.length;
+                const totalAttachments = notes.reduce((acc, n) => acc + (n.attachments?.length || 0), 0);
+                statsSpan.textContent = `📄 ${totalNotes} 条笔记 · ${totalAttachments} 个附件`;
+            }
+
+            // 保存并重绘
+            function updateNotes(newNotes) {
+                notes = newNotes;
+                saveNotes(notes);
+                render();
+            }
+
+            // 添加笔记
+            function addNote() {
+                const text = noteTextarea.value.trim();
+
+                if (text === '' && selectedFiles.length === 0) {
+                    alert('文字或文件至少填写一项');
+                    return;
+                }
+
+                const newNote = {
+                    id: Date.now() + Math.floor(Math.random() * 1000),
+                    text: text,
+                    attachments: selectedFiles.slice() // 复制当前选择的文件数组
+                };
+
+                const updated = [newNote, ...notes];
+                updateNotes(updated);
+
+                // 清空输入和文件
+                noteTextarea.value = '';
+                clearSelectedFiles();
+                noteTextarea.focus();
+            }
+
+            addBtn.addEventListener('click', addNote);
+            noteTextarea.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && e.ctrlKey) {  // Ctrl+Enter 添加
+                    e.preventDefault();
+                    addNote();
+                }
+            });
+
+            // 删除笔记 (事件委托)
+            container.addEventListener('click', (e) => {
+                const delBtn = e.target.closest('.delete-note');
+                if (delBtn) {
+                    const id = Number(delBtn.dataset.id);
+                    const newNotes = notes.filter(n => n.id !== id);
+                    updateNotes(newNotes);
+                }
+            });
+
+            // 清空全部
+            clearAllBtn.addEventListener('click', () => {
+                if (notes.length === 0) return;
+                if (confirm('确定要删除所有笔记吗？')) {
+                    updateNotes([]);
+                    clearSelectedFiles();
+                }
+            });
+
+            // 初始化渲染
+            render();
+
+            // 附加说明：点击下载链接直接下载，因为a的download属性
+            // 安全：dataUrl使用escapeHtml转义后放在href中没问题
+        })();
+    </script>
+</body>
+</html>

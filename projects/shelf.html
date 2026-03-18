@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四个项目首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;        /* 白色主体 */
+            color: #1e293b;                    /* 深灰文字 */
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .shelf {
+            max-width: 1000px;                 /* 与之前 section 一致 */
+            width: 100%;
+        }
+
+        /* 头部 — 使用灰色竖条装饰 */
+        .shelf-header {
+            margin-bottom: 3rem;
+        }
+
+        .shelf-header h1 {
+            font-size: 2.2rem;                  /* 与之前 h2 接近但稍大 */
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: #0f172a;                      /* 更深的首字 */
+            border-left: 6px solid #a0b3c9;      /* 灰色竖条 */
+            padding-left: 1.2rem;
+            line-height: 1.2;
+        }
+
+        .shelf-header p {
+            font-size: 1.1rem;
+            color: #4a5f73;                       /* 中灰文字 */
+            margin-top: 0.6rem;
+            padding-left: 1.8rem;                  /* 与 h1 文字对齐感 */
+        }
+
+        /* 网格 — 两列，间距与之前卡片间距离一致 */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.8rem;
+            margin: 2rem 0 3rem;
+        }
+
+        @media (max-width: 600px) {
+            .project-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        /* 卡片 — 统一为作品集卡片样式 */
+        .project-card {
+            display: block;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 2rem 1.8rem 1.8rem 1.8rem;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid #dbe2ea;           /* 浅灰边框 */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.02);
+            transition: all 0.25s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-6px);
+            border-color: #9aafc4;                /* 深灰边框 */
+            box-shadow: 0 20px 30px -10px rgba(100,120,140,0.15);
+        }
+
+        /* 卡片内表情符号 */
+        .card-emoji {
+            font-size: 2.8rem;
+            line-height: 1;
+            display: block;
+            margin-bottom: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .card-title {
+            font-size: 1.5rem;                    /* 与之前卡片 h3 一致 */
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #0f172a;
+            border-bottom: 1px dashed #d4dce6;    /* 浅灰虚线，比之前柔和 */
+            padding-bottom: 0.5rem;
+        }
+
+        .card-title .arrow {
+            font-size: 1.3rem;
+            color: #9aa6b5;                         /* 灰色箭头 */
+            transition: color 0.2s, transform 0.15s;
+        }
+
+        .project-card:hover .card-title .arrow {
+            color: #4b5565;                         /* 深灰 */
+            transform: translateX(4px);
+        }
+
+        .card-desc {
+            color: #3e5569;                          /* 中深灰 */
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-top: 0.4rem;
+        }
+
+        /* 脚注 — 灰色背景标签风格 */
+        .shelf-footer {
+            margin-top: 3rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #5e6b7e;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1.5rem;
+        }
+
+        .path {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            background: #eef2f6;                     /* 浅灰背景 */
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            color: #2d3e50;
+            font-size: 0.8rem;
+            border: 1px solid #d0d9e2;
+        }
+
+        .note {
+            color: #6b7b8f;
+        }
+
+        /* 响应式微调 */
+        @media (max-width: 480px) {
+            .shelf-header h1 {
+                font-size: 1.9rem;
+            }
+            .card-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="shelf">
+        <div class="shelf-header">
+            <h1>小小项目 shelf</h1>
+            <p>点击卡片直接跳转</p>
+        </div>
+
+        <div class="project-grid">
+            <!-- cat.html 小猫图片 -->
+            <a href="cat.html" class="project-card">
+                <span class="card-emoji">🐈‍⬛</span>
+                <div class="card-title">
+                    小猫图片
+                    <span class="arrow">↗</span>
+                </div>
+                <div class="card-desc">
+                    每次刷新都是新的小猫 · 来自随机API
+                </div>
+            </a>
+
+            <!-- exam.html 题库练习系统 -->
+            <a href="exam.html" class="project-card">
+                <span class="card-emoji">📘</span>
+                <div class="card-title">
+                    题库练习
+                    <span class="arrow">↗</span>
+                </div>
+                <div class="card-desc">
+                    轻量练习系统 · 检验知识点
+                </div>
+            </a>
+
+            <!-- game.html 俄罗斯方块 -->
+            <a href="game.html" class="project-card">
+                <span class="card-emoji">◻️◻️</span>
+                <div class="card-title">
+                    俄罗斯方块
+                    <span class="arrow">↗</span>
+                </div>
+                <div class="card-desc">
+                    经典下落 · 键盘控制 · 怀旧时刻
+                </div>
+            </a>
+
+            <!-- timer.html 90分钟计时器 -->
+            <a href="timer.html" class="project-card">
+                <span class="card-emoji">⏳</span>
+                <div class="card-title">
+                    90' 计时器
+                    <span class="arrow">↗</span>
+                </div>
+                <div class="card-desc">
+                    专注学习法 · 90分钟可设定
+                </div>
+            </a>
+        </div>
+
+        <div class="shelf-footer">
+            <span class="note">四个离线工具 · 即点即用</span>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,239 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+}
+nav {
+    position: fixed;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 40px;
+    border-bottom: 1px solid #d0d7de;
+    z-index: 100;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+}
+
+.nav-brand {
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: #1f2a36;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.nav-right a {
+    color: #2d3e50;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.nav-right a:hover {
+    color: black;
+}
+
+.lang-select {
+    background: white;
+    border: 1.5px solid #b0c0cd;
+    color: #2d3e50;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 6px 28px 6px 14px;
+    border-radius: 40px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px;
+}
+
+.lang-select:hover {
+    border-color: #7f8c9a;
+    background-color: #f5f7fa;
+}
+
+.lang-select:focus {
+    outline: none;
+    border-color: #5f6b7a;
+    box-shadow: 0 0 0 3px rgba(100, 120, 140, 0.15);
+}
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: #ffffff;
+    color: #2d3e50;
+    padding: 0 20px;
+    border-bottom: 1px solid #e9ecf0;
+}
+
+.hero h1 {
+    font-size: 3.2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #1e2b3a;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    color: #4a5f73;
+    max-width: 600px;
+    margin-top: 8px;
+}
+/* About 部分文本样式 */
+#aboutText-container {
+    color: #3e5569;
+    line-height: 1.8;
+    font-size: 1.05rem;
+}
+
+#aboutText-container p {
+    margin-bottom: 16px;
+    text-align: justify;
+}
+
+#aboutText-container p:last-child {
+    margin-bottom: 0;
+}
+
+section {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 80px 24px;
+    background: white;
+}
+
+h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #1e2b3a;
+    border-left: 6px solid #a0b3c9;
+    padding-left: 16px;
+}
+section {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 80px 24px;
+    background: white;
+}
+
+h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #1e2b3a;
+    border-left: 6px solid #a0b3c9;
+    padding-left: 16px;
+}
+.skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.skills span {
+    display: inline-block;
+    padding: 8px 20px;
+    background: #eef2f6;
+    border-radius: 40px;
+    font-weight: 500;
+    border: 1px solid #d0d9e2;
+    transition: 0.2s;
+    cursor: default;
+}
+
+.skills span:hover {
+    background: #d7e0e9;
+    border-color: #9aafc4;
+    transform: translateY(-2px);
+}
+.card {
+    background: white;
+    padding: 28px;
+    margin: 28px 0;
+    border-radius: 24px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.02);
+    border: 1px solid #dbe2ea;
+    transition: 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 30px -10px rgba(100,120,140,0.15);
+    border-color: #9aafc4;
+}
+
+.card h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: #1e2b3a;
+}
+
+.card p {
+    color: #3e5569;
+    margin-bottom: 12px;
+    line-height: 1.6;
+}
+
+.card strong {
+    color: #2c3f57;
+}
+.card-link,
+.card-link:hover,
+#projects-container a,
+#projects-container a:hover {
+    text-decoration: none !important;
+    color: inherit;
+}
+#contact p {
+    font-size: 1.2rem;
+    background: #f5f7fa;
+    display: inline-block;
+    padding: 10px 28px;
+    border-radius: 60px;
+    border: 1px solid #d0d9e2;
+    color: #2d3e50;
+}
+
+footer {
+    text-align: center;
+    padding: 32px 24px;
+    background: #f0f3f7;
+    color: #4f6579;
+    font-size: 0.95rem;
+    border-top: 1px solid #dbe2ea;
+}
+@media (max-width: 600px) {
+    nav {
+        padding: 14px 20px;
+    }
+    .hero h1 {
+        font-size: 2.4rem;
+    }
+    .nav-right {
+        gap: 16px;
+    }
+    .lang-select {
+        padding: 4px 24px 4px 10px;
+        background-position: right 6px center;
+    }
+}
